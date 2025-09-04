@@ -55,3 +55,14 @@ def adj_to_matrix(G):
 
             G[i][j] = w 
     return matrix 
+
+def edges_to_matrix(G):
+    n = max(max(u,v) for u,v,_ in G) + 1
+
+    matrix = [[0 for _ in range(n)] for _ in range(n)]
+
+    for u,v,w in G:
+        matrix[u][v] = w
+        matrix[v][u] = w
+        
+    return matrix
