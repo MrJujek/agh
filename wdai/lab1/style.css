@@ -1,15 +1,30 @@
-
 html {
- background-color: #DDBEAA;
- height: 100vh;
+  background-color: #ddbeaa;
+  height: 100vh;
 }
 body {
- height: 100vh;
- margin: 0;
+  margin: 10px;
 }
 .main-container {
- height: 100%;
- display: flex;
- align-items: center;
- justify-content: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+td {
+  padding: 10px;
+  border: 1px solid black;
+}
+
+.mom > div {
+  display: flex;
+}
+.box {
+  width: 100px;
+  height: 100px;
+  margin: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
