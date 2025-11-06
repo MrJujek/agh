@@ -21,3 +21,15 @@ FROM customers
     LEFT OUTER JOIN orders
     ON customers.customerid = orders.customerid
 WHERE orderid is null
+
+SELECT Suppliers.companyname, shippers.companyname
+FROM Suppliers
+CROSS JOIN shippers
+
+SELECT orderdate, productname
+from orders as o
+    inner join [Order Details] as od
+    on o.OrderID = od.OrderID
+    inner join products as p
+    on od.ProductID = p.ProductID
+where OrderDate = '1996-07-08'
