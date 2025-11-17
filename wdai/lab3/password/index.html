@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password generator</title>
+    <link
+      rel="stylesheet"
+      href="https://pyscript.net/releases/2024.11.1/core.css"
+    />
+    <script
+      type="module"
+      src="https://pyscript.net/releases/2024.11.1/core.js"
+    ></script>
+  </head>
+  <body>
+    <div>
+      <input type="checkbox" name="upper" id="upper" />
+      <label for="upper">Include uppercase letters</label><br />
+      <input type="checkbox" name="lower" id="lower" />
+      <label for="lower">Include lowercase letters</label><br />
+      <input type="checkbox" name="digits" id="digits" />
+      <label for="digits">Include digits</label><br />
+      <input type="checkbox" name="special" id="special" />
+      <label for="special">Include special characters</label><br />
+      <label for="lengthInput">Password length:</label>
+      <input
+        type="range"
+        name="lengthInput"
+        id="lengthInput"
+        min="4"
+        max="32"
+        value="12"
+        step="1"
+        oninput="lengthOutput.value = lengthInput.value"
+      />
+      <output name="lengthOutput" id="lengthOutput" for="lengthInput">12</output
+      ><br />
+      <!-- <label for="strength">Desired strength (1-5):</label>
+      <input
+        type="number"
+        name="strength"
+        id="strength"
+        min="1"
+        max="5"
+        value="3"
+      />
+      <br /> -->
+      <button type="button" id="generate">Generate password</button>
+      <p style="color: red" id="error"></p>
+    </div>
+    <script type="py" src="./script.py"></script>
+  </body>
+</html>

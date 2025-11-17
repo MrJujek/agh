@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>api</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="controls">
+      <label for="filterInput">Search:</label>
+      <input type="text" id="filterInput" />
+
+      <label for="sortSelect">Sort:</label>
+      <select id="sortSelect">
+        <option value="original">Original</option>
+        <option value="asc">Ascending (A-Z)</option>
+        <option value="desc">Descending (Z-A)</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Photo</th>
+          <th>Title</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
