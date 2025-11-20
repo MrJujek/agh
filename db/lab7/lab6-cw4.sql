@@ -4,11 +4,16 @@ use Northwind;
 select
     e.firstname,
     e.lastname,
-    round(sum(od.unitprice * od.quantity * (1 - od.discount)) / count(distinct e2.EmployeeID), 2) as 'Łączna wartość'
+    round(sum(od.unitprice * od.quantity * (1 - od.discount)),2) as 'Łączna wartość'
 from employees as e
     join orders as o on e.employeeid = o.employeeid
     join [order details] as od on o.orderid = od.orderid
-    join Employees as e2 on e.EmployeeID = e2.ReportsTo
+where
+    exists (
+select 1
+from employees as sub
+where sub.reportsto = e.employeeid
+    )
 group by e.employeeid, e.firstname, e.lastname
 order by 3 desc
 
@@ -16,11 +21,15 @@ order by 3 desc
 select
     e.firstname,
     e.lastname,
-    round(sum(od.unitprice * od.quantity * (1 - od.discount)), 2) as 'Łączna wartość'
+    round(sum(od.unitprice * od.quantity * (1 - od.discount)),2) as 'Łączna wartość'
 from employees as e
     join orders as o on e.employeeid = o.employeeid
     join [order details] as od on o.orderid = od.orderid
-    left join Employees as e2 on e.EmployeeID = e2.ReportsTo
-where e2.ReportsTo is Null
+where
+    not exists (
+select 1
+from employees as sub
+where sub.reportsto = e.employeeid
+    )
 group by e.employeeid, e.firstname, e.lastname
 order by 3 desc
