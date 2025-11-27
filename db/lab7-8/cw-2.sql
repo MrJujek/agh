@@ -15,14 +15,15 @@ select
         and year(o.OrderDate) = 1996
   ) as "Wartość zamowień w 1996"
 from
-    Customers as c;
+    Customers as c
+order by 3 desc;
 
 -- 2
 select
     c.CustomerID,
     c.CompanyName,
     (
-        isnull((
+        round(isnull((
             select sum(od.UnitPrice * od.Quantity * (1 - od.Discount))
     from Orders as o
         join [Order Details] as od on o.OrderID = od.OrderID
@@ -35,10 +36,11 @@ select
     from Orders as o
     where o.CustomerID = c.CustomerID
         and year(o.OrderDate) = 1996
-        ), 0)
+        ), 0), 2)
     ) as "wartość zamówień w 1996"
 from
-    Customers as c;
+    Customers as c
+order by 3 desc;
 
 -- 3
 select
@@ -62,4 +64,5 @@ select
       ) as SubQueryTable
   ) as "Max wartość w 1997"
 from
-    Customers as c;
+    Customers as c
+order by 3 desc;
