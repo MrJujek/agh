@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Teko', sans-serif;
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    width: 432px;
+    height: 768px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated; /* Keep pixel art sharp when scaled */
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#score-display {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 0 #000;
+    z-index: 10;
+}
+
+#start-screen, #game-over-screen, #congrats-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#game-over-title {
+    margin-bottom: 20px;
+}
+
+#scoreboard {
+    background-color: #ded895;
+    border: 2px solid #543847;
+    padding: 15px;
+    border-radius: 5px;
+    width: 200px;
+    margin-bottom: 20px;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+}
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 24px;
+    color: #e86101;
+    font-weight: bold;
+}
+
+#leaderboard {
+    background-color: #ded895;
+    border: 2px solid #543847;
+    padding: 10px;
+    border-radius: 5px;
+    width: 200px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+}
+
+#leaderboard h3 {
+    margin: 0 0 10px 0;
+    color: #e86101;
+    text-transform: uppercase;
+}
+
+#high-scores-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+#high-scores-list li {
+    font-size: 18px;
+    color: #543847;
+    border-bottom: 1px solid rgba(84, 56, 71, 0.2);
+    padding: 2px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+#restart-btn {
+    background-color: #e86101;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 24px;
+    font-family: 'Teko', sans-serif;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 2px solid white;
+    box-shadow: 0 4px 0 #9e4200;
+    transition: transform 0.1s;
+}
+
+#restart-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #9e4200;
+}
+
+#congrats-screen h1 {
+    font-size: 48px;
+    color: #e86101;
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 #543847;
+    margin: 0;
+    animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+}

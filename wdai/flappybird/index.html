@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="288" height="512"></canvas>
+        
+        <div id="ui-layer">
+            <div id="score-display">0</div>
+            
+            <div id="start-screen">
+                <img src="assets/UI/message.png" alt="Get Ready">
+            </div>
+            
+            <div id="congrats-screen" class="hidden">
+                <h1>NOWY REKORD!</h1>
+                <div class="medal-shine"></div>
+            </div>
+
+            <div id="game-over-screen" class="hidden">
+                <img src="assets/UI/gameover.png" alt="Game Over" id="game-over-title">
+                
+                <div id="scoreboard">
+                    <div class="score-row">
+                        <span>Wynik:</span>
+                        <span id="current-score">0</span>
+                    </div>
+                    <div class="score-row">
+                        <span>Najlepszy:</span>
+                        <span id="best-score">0</span>
+                    </div>
+                </div>
+
+                <div id="leaderboard">
+                    <h3>Top 5 Wyników</h3>
+                    <ul id="high-scores-list"></ul>
+                </div>
+
+                <button id="restart-btn">Zagraj ponownie</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
