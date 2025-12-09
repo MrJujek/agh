@@ -1,0 +1,15 @@
+{
+  "name": "microservices-bookstore",
+  "version": "1.0.0",
+  "workspaces": [
+    "books-service",
+    "orders-service",
+    "users-service"
+  ],
+  "scripts": {
+    "start": "concurrently \"bun --cwd books-service start\" \"bun --cwd orders-service start\" \"bun --cwd users-service start\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
