@@ -7,6 +7,7 @@
     "users-service"
   ],
   "scripts": {
+    "test": "bun --cwd books-service test && bun --cwd orders-service test && bun --cwd users-service test",
     "start": "concurrently \"bun --cwd books-service start\" \"bun --cwd orders-service start\" \"bun --cwd users-service start\""
   },
   "devDependencies": {
