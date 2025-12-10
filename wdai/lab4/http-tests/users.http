@@ -1,0 +1,21 @@
+### Register User
+POST http://localhost:3003/api/register
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
+
+### Login User
+# @name login
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
+
+###
+@authToken = {{login.response.body.token}}

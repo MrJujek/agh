@@ -1,0 +1,28 @@
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzY0ODYyMTIxLCJleHAiOjE3NjQ4NjU3MjF9.LvZvKQuDLjJkFiQ7x0MI1GMkYumPRiqLRE27-bIBHk4
+
+### Get Orders for User
+GET http://localhost:3002/api/orders/1
+
+### Create Order
+POST http://localhost:3002/api/orders
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "userId": 1,
+    "bookId": 1,
+    "quantity": 2
+}
+
+### Update Order
+PATCH http://localhost:3002/api/orders/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "quantity": 5
+}
+
+### Delete Order
+DELETE http://localhost:3002/api/orders/1
+Authorization: Bearer {{authToken}}
