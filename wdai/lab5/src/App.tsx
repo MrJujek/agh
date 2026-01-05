@@ -11,6 +11,7 @@ import StudentManager from './components/students/StudentManager';
 import EffectCounter from './components/effects/EffectCounter';
 import Title from './components/effects/Title';
 import Countdown from './components/effects/Countdown';
+import Comments from './components/products/Comments';
 import './App.css';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Title />
         <Countdown />
       </div>
+      <Comments />
     </div>
   );
 }
