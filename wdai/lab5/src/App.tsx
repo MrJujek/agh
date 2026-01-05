@@ -8,6 +8,9 @@ import Ternary from './components/other/Ternary';
 import Update from './components/other/Update';
 import Students from './components/students/Students';
 import StudentManager from './components/students/StudentManager';
+import EffectCounter from './components/effects/EffectCounter';
+import Title from './components/effects/Title';
+import Countdown from './components/effects/Countdown';
 import './App.css';
 
 function App() {
@@ -30,6 +33,11 @@ function App() {
       <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <Students />
         <StudentManager />
+      </div>
+      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <EffectCounter />
+        <Title />
+        <Countdown />
       </div>
     </div>
   );
