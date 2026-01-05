@@ -4,6 +4,10 @@ import NewCounter from './components/counters/NewCounter';
 import Form from './components/forms/Form';
 import Password from './components/forms/Password';
 import Login from './components/forms/Login';
+import Ternary from './components/other/Ternary';
+import Update from './components/other/Update';
+import Students from './components/students/Students';
+import StudentManager from './components/students/StudentManager';
 import './App.css';
 
 function App() {
@@ -18,6 +22,14 @@ function App() {
         <Form />
         <Password />
         <Login />
+      </div>
+      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Ternary />
+        <Update />
+      </div>
+      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Students />
+        <StudentManager />
       </div>
     </div>
   );
