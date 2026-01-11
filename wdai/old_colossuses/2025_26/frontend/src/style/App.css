@@ -40,3 +40,24 @@
 .read-the-docs {
   color: #888;
 }
+
+.containers {
+  display: flex;
+  flex-direction: row;
+  margin: 10;
+  flex-wrap: wrap;
+
+  >div {
+    padding: 10px;
+  }
+}
+
+.level {
+  min-width: 50px;
+  width: auto;
+  height: 20px;
+  border: 1px solid gray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
