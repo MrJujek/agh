@@ -1,0 +1,5 @@
+head -n 27 /etc/passwd | tail -n 1
+
+1. find / 2>/dev/null | wc -l 2>/dev/null
+2. w -h | wc -l
+3. wc -w /usr/include/utime.h

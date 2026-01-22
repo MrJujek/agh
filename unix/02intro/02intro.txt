@@ -1,0 +1,11 @@
+zadania sprawdzajace
+1. cut -d':' -f1
+2. grep -E "^[^:]*:[^:]*:14:(14){0}" /etc/passwd | cut -d':' -f5
+3. 
+4. awk -F':' '$7 == "/bin/bash"{ print $1}' /etc/passwd
+5. awk -F':' '$3>20{ print $1}' /etc/passwd | wc -l
+6. cut -d':' -f3 /etc/group | sort -n | tail -1
+7.  
+8. 
+9. 
+10. man	ls > ls.txt
