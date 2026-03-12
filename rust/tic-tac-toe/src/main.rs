@@ -31,7 +31,13 @@ fn main() {
             break;
         }
 
-        let pos = cmd.to_digit(10).unwrap() as usize - 1;
+        let pos = match cmd.to_digit(10) {
+            Some(p) if (1..=9).contains(&p) => p as usize - 1,
+            _ => {
+                println!("Invalid input. Please enter a number between 1 and 9.");
+                continue;
+            }
+        };
 
         let row = pos / BOARD_SIZE;
         let col = pos % BOARD_SIZE;
@@ -99,7 +105,7 @@ fn check_for_win(board: [[char; BOARD_SIZE]; BOARD_SIZE], player: char) -> bool 
 fn check_for_draw(board: [[char; BOARD_SIZE]; BOARD_SIZE]) -> bool {
     for i in 0..BOARD_SIZE {
         for j in 0..BOARD_SIZE {
-            if board[i][j] != 'X' || board[i][j] != 'O' {
+            if board[i][j] != 'X' && board[i][j] != 'O' {
                 return false;
             }
         }
