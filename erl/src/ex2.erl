@@ -23,8 +23,10 @@ contains([_ | Tail], Value) -> contains(Tail, Value).
 duplicate_elements([]) -> [];
 duplicate_elements([Head | Tail]) -> [Head, Head | duplicate_elements(Tail)].
 
-sum_floats([]) -> 0.0;
-sum_floats([Head | Tail]) when is_float(Head) ->
-  Head + sum_floats(Tail);
-sum_floats([_ | Tail]) ->
-  sum_floats(Tail).
+sum_floats(List) -> sum_floats_tail(List, 0.0).
+
+sum_floats_tail([], Acc) -> Acc;
+sum_floats_tail([Head | Tail],Acc) when is_float(Head) ->
+  sum_floats_tail(Tail, Acc + Head);
+sum_floats_tail([_ | Tail], Acc) ->
+  sum_floats_tail(Tail, Acc).
