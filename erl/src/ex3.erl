@@ -10,7 +10,7 @@
 -author("julia").
 
 %% API
--export([getData/0]).
+-export([getData/0, numberOfReadings/2]).
 
 getData() ->
   [
@@ -19,3 +19,12 @@ getData() ->
     {"station_3", {{2026, 3, 15}, {12, 45, 44}}, [{pm1, 30.0}, {pm64, 20.0}]},
     {"station_4", {{2026, 3, 15}, {21, 04, 34}}, [{press, 25.0}, {hum, 55.0}]}
   ].
+
+numberOfReadings(Readings, Date) ->
+  numberOfReadings(Readings, Date, 0).
+
+numberOfReadings([], _, Acc) -> Acc;
+numberOfReadings([{_, {Date, _}, _} | Tail], Date, Acc) ->
+  numberOfReadings(Tail, Date, Acc + 1);
+numberOfReadings([_ | Tail], Date, Acc) ->
+  numberOfReadings(Tail, Date, Acc).
