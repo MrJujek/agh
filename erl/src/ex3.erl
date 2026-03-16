@@ -10,14 +10,14 @@
 -author("julia").
 
 %% API
--export([getData/0, numberOfReadings/2, calculateMinAndMax/2]).
+-export([getData/0, numberOfReadings/2, calculateMinAndMax/2, calculateMean/2]).
 
 getData() ->
   [
     {"station_1", {{2026, 3, 15}, {10, 23, 43}}, [{pm10, 10.0}, {pm25, 5.0}]},
     {"station_2", {{2026, 3, 15}, {14, 29, 11}}, [{pm10, 12.0}, {pm25, 6.0}, {temp, 19.0}]},
     {"station_3", {{2026, 3, 15}, {12, 45, 44}}, [{pm1, 30.0}, {pm64, 20.0}]},
-    {"station_4", {{2026, 3, 15}, {21, 04, 34}}, [{press, 25.0}, {hum, 55.0}]}
+    {"station_4", {{2026, 3, 15}, {21, 04, 34}}, [{pm25, 10.0}, {press, 25.0}, {hum, 55.0}]}
   ].
 
 numberOfReadings(Readings, Date) ->
@@ -59,3 +59,16 @@ findMinMax([Value | Tail], Min, Max) when Value > Max ->
   findMinMax(Tail, Min, Value);
 findMinMax([_Value | Tail], Min, Max) ->
   findMinMax(Tail, Min, Max).
+
+calculateMean(Readings, Type) ->
+  doCalculateMean(getValuesByType(Readings, Type)).
+
+doCalculateMean([]) ->
+  {error, no_data_for_type};
+doCalculateMean(Values) ->
+  calcMeanRecursive(Values, 0, 0).
+
+calcMeanRecursive([], Sum, Count) ->
+  Sum / Count;
+calcMeanRecursive([Value | Tail], Sum, Count) ->
+  calcMeanRecursive(Tail, Sum + Value, Count + 1).
