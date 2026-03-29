@@ -10,7 +10,7 @@
 -author("julia").
 
 %% API
--export([create_monitor/0, add_station/3, add_value/5, remove_value/4]).
+-export([create_monitor/0, add_station/3, add_value/5, remove_value/4, get_one_value/4, get_station_min/3, get_daily_mean/3]).
 
 create_monitor() ->
   #{
@@ -61,4 +61,40 @@ remove_value(StationId, Date, Type, Monitor) ->
       Key = {Coords, Date, Type},
       Monitor#{measurements => maps:remove(Key, Measurements)};
     {error, Msg} -> {error, Msg}
+  end.
+
+get_one_value(StationId, Date, Type, Monitor) ->
+  case get_coords(StationId, Monitor) of
+    {ok, Coords} ->
+      #{measurements := Measurements} = Monitor,
+      Key = {Coords, Date, Type},
+      case maps:find(Key, Measurements) of
+        {ok, Value} -> Value;
+        error -> {error, "Measurement not found"}
+      end;
+    {error, Msg} -> {error, Msg}
+  end.
+
+get_station_min(StationId, Type, Monitor) ->
+  case get_coords(StationId, Monitor) of
+    {ok, Coords} ->
+      #{measurements := Measurements} = Monitor,
+      Values = [V || {{C, _Date, T}, V} <- maps:to_list(Measurements), C == Coords, T == Type],
+      case Values of
+        [] -> {error, "No measurements found"};
+        _ -> lists:min(Values)
+      end;
+    {error, Msg} -> {error, Msg}
+  end.
+
+get_day({Y, M, D}) -> {Y, M, D};
+get_day({{Y, M, D}, _Time}) -> {Y, M, D}.
+
+get_daily_mean(Type, Date, Monitor) ->
+  #{measurements := Measurements} = Monitor,
+  TargetDay = get_day(Date),
+  Values = [V || {{_Coords, D, T}, V} <- maps:to_list(Measurements), T == Type, get_day(D) == TargetDay],
+  case Values of
+    [] -> {error, "No measurements found"};
+    _ -> lists:sum(Values) / length(Values)
   end.
