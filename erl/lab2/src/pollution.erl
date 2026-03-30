@@ -10,7 +10,7 @@
 -author("julia").
 
 %% API
--export([create_monitor/0, add_station/3, add_value/5, remove_value/4, get_one_value/4, get_station_min/3, get_daily_mean/3]).
+-export([create_monitor/0, add_station/3, add_value/5, remove_value/4, get_one_value/4, get_station_min/3, get_station_mean/3, get_daily_mean/3]).
 
 create_monitor() ->
   #{
@@ -89,6 +89,18 @@ get_station_min(StationId, Type, Monitor) ->
 
 get_day({Y, M, D}) -> {Y, M, D};
 get_day({{Y, M, D}, _Time}) -> {Y, M, D}.
+
+get_station_mean(StationId, Type, Monitor) ->
+  case get_coords(StationId, Monitor) of
+    {ok, Coords} ->
+      #{measurements := Measurements} = Monitor,
+      Values = [V || {{C, _Date, T}, V} <- maps:to_list(Measurements), C == Coords, T == Type],
+      case Values of
+        [] -> {error, "No measurements found"};
+        _ -> lists:sum(Values) / length(Values)
+      end;
+    {error, Msg} -> {error, Msg}
+  end.
 
 get_daily_mean(Type, Date, Monitor) ->
   #{measurements := Measurements} = Monitor,
