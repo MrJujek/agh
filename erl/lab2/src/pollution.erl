@@ -10,7 +10,7 @@
 -author("julia").
 
 %% API
--export([create_monitor/0, add_station/3, add_value/5, remove_value/4, get_one_value/4, get_station_min/3, get_station_mean/3, get_daily_mean/3, get_daily_over_limit/4]).
+-export([create_monitor/0, add_station/3, add_value/5, remove_value/4, get_one_value/4, get_station_min/3, get_station_mean/3, get_daily_mean/3, get_daily_over_limit/4, get_air_quality_index/3]).
 
 create_monitor() ->
   #{
@@ -119,3 +119,20 @@ get_daily_over_limit(Type, Date, Limit, Monitor) ->
   TargetDay = get_day(Date),
   OverLimitStations = [Coords || {{Coords, D, T}, V} <- maps:to_list(Measurements), T == Type, get_day(D) == TargetDay, V > Limit],
   length(lists:usort(OverLimitStations)).
+
+get_norm("PM10") -> 50;
+get_norm("PM2.5") -> 30;
+get_norm("PM25") -> 30;
+get_norm(_) -> 100.
+
+get_air_quality_index(StationId, Date, Monitor) ->
+  case get_coords(StationId, Monitor) of
+    {ok, Coords} ->
+      #{measurements := Measurements} = Monitor,
+      Acc = [ (V / get_norm(T)) * 100 || {{C, D, T}, V} <- maps:to_list(Measurements), C == Coords, D == Date ],
+      case Acc of
+        [] -> {error, "No measurements found"};
+        _ -> lists:max(Acc)
+      end;
+    {error, Msg} -> {error, Msg}
+  end.
