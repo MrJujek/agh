@@ -59,7 +59,10 @@ remove_value(StationId, Date, Type, Monitor) ->
     {ok, Coords} ->
       #{measurements := Measurements} = Monitor,
       Key = {Coords, Date, Type},
-      Monitor#{measurements => maps:remove(Key, Measurements)};
+      case maps:is_key(Key, Measurements) of
+        true -> Monitor#{measurements => maps:remove(Key, Measurements)};
+        false -> {error, "Measurement not found"}
+      end;
     {error, Msg} -> {error, Msg}
   end.
 
