@@ -9,7 +9,7 @@ create table person
          primary key,
   firstname varchar(50),
   lastname varchar(50)
-)
+);
 
 alter table person
     modify person_id int default s_person_seq.nextval;

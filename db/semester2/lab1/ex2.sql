@@ -70,3 +70,42 @@ BEGIN
     RETURN v_cursor;
 END;
 /
+
+CREATE OR REPLACE FUNCTION f_available_trips_to(
+    p_country IN VARCHAR2,
+    p_date_from IN DATE,
+    p_date_to IN DATE
+)
+RETURN SYS_REFCURSOR
+AS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    IF p_date_from > p_date_to THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Start date cannot be later than end date.');
+    END IF;
+
+    OPEN v_cursor FOR
+    SELECT 
+        t.trip_id,
+        t.trip_name,
+        t.country,
+        t.trip_date,
+        t.max_no_places,
+        (t.max_no_places - (
+            SELECT COUNT(*)
+            FROM reservation r
+            WHERE r.trip_id = t.trip_id AND r.status IN ('N', 'P')
+        )) AS free_places
+    FROM trip t
+    WHERE t.country = p_country
+      AND t.trip_date >= p_date_from
+      AND t.trip_date <= p_date_to
+      AND t.max_no_places > (
+          SELECT COUNT(*)
+          FROM reservation r
+          WHERE r.trip_id = t.trip_id AND r.status IN ('N', 'P')
+      );
+
+    RETURN v_cursor;
+END;
+/
