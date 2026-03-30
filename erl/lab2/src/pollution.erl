@@ -10,7 +10,7 @@
 -author("julia").
 
 %% API
--export([create_monitor/0, add_station/3, add_value/5, remove_value/4, get_one_value/4, get_station_min/3, get_station_mean/3, get_daily_mean/3]).
+-export([create_monitor/0, add_station/3, add_value/5, remove_value/4, get_one_value/4, get_station_min/3, get_station_mean/3, get_daily_mean/3, get_daily_over_limit/4]).
 
 create_monitor() ->
   #{
@@ -113,3 +113,9 @@ get_daily_mean(Type, Date, Monitor) ->
     [] -> {error, "No measurements found"};
     _ -> lists:sum(Values) / length(Values)
   end.
+
+get_daily_over_limit(Type, Date, Limit, Monitor) ->
+  #{measurements := Measurements} = Monitor,
+  TargetDay = get_day(Date),
+  OverLimitStations = [Coords || {{Coords, D, T}, V} <- maps:to_list(Measurements), T == Type, get_day(D) == TargetDay, V > Limit],
+  length(lists:usort(OverLimitStations)).
