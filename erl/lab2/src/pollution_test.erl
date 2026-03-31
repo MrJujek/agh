@@ -222,3 +222,34 @@ get_daily_mean_fail_test() ->
   ?assertMatch({error, _}, pollution:get_daily_mean("PM25",{2023,3,27}, M2)),
   ?assertMatch({error, _}, pollution:get_daily_mean("PM10",{2023,3,29}, M2)).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+get_daily_over_limit_test() ->
+  M = pollution:add_station("Stacja 3", {3,3}, pollution:add_station("Stacja 2", {2,2}, pollution:add_station("Stacja 1", {1,1}, pollution:create_monitor()))),
+  M1 = pollution:add_value("Stacja 1", {{2023,3,27},{11,16,10}}, "PM10", 10, M),
+  M2 = pollution:add_value("Stacja 1", {{2023,3,27},{12,16,10}}, "PM10", 20, M1),
+  M3 = pollution:add_value("Stacja 2", {{2023,3,27},{11,16,11}}, "PM10", 30, M2),
+  M4 = pollution:add_value("Stacja 3", {{2023,3,27},{11,16,12}}, "PM10", 5, M3),
+
+  ?assertEqual(2, pollution:get_daily_over_limit("PM10", {2023,3,27}, 15, M4)),
+  ?assertEqual(1, pollution:get_daily_over_limit("PM10", {2023,3,27}, 25, M4)),
+  ?assertEqual(0, pollution:get_daily_over_limit("PM10", {2023,3,27}, 35, M4)),
+  ?assertEqual(0, pollution:get_daily_over_limit("PM10", {2023,3,28}, 15, M4)).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+get_air_quality_index_test() ->
+  M = pollution:add_station("Stacja 1", {1,1}, pollution:create_monitor()),
+  Time = {{2023,3,27},{11,16,10}},
+  M1 = pollution:add_value("Stacja 1", Time, "PM10", 75, M),
+  M2 = pollution:add_value("Stacja 1", Time, "PM25", 60, M1),
+  
+  ?assertEqual(200.0, pollution:get_air_quality_index("Stacja 1", Time, M2)),
+  ?assertEqual(200.0, pollution:get_air_quality_index({1,1}, Time, M2)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+get_air_quality_index_fail_test() ->
+  M = pollution:add_station("Stacja 1", {1,1}, pollution:create_monitor()),
+  Time = {{2023,3,27},{11,16,10}},
+  ?assertMatch({error, _}, pollution:get_air_quality_index("Stacja 1", Time, M)),
+  ?assertMatch({error, _}, pollution:get_air_quality_index("Stacja 2", Time, M)).
