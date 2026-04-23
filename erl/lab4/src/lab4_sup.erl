@@ -33,7 +33,9 @@ init([]) ->
   },
   ChildSpecs = [
     #{id => pollution_gen_server,
-      start => {pollution_gen_server, start_link, []}}
+      start => {pollution_gen_server, start_link, []}},
+    #{id => pollution_value_collector_gen_statem,
+      start => {pollution_value_collector_gen_statem, start_link, []}}
   ],
   {ok, {SupFlags, ChildSpecs}}.
 
