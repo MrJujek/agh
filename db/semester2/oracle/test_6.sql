@@ -14,20 +14,17 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Rozpoczynam testy dla zadań 6a i 6b...');
     DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
 
-    -- Pobieranie nowych ID dla danych testowych
     SELECT s_trip_seq.nextval INTO v_trip_id_6a FROM dual;
     SELECT s_trip_seq.nextval INTO v_trip_id_6b FROM dual;
     SELECT s_person_seq.nextval INTO v_person_id FROM dual;
     SELECT s_person_seq.nextval INTO v_person_id2 FROM dual;
 
-    -- Dodajemy testowe wycieczki
     INSERT INTO trip (trip_id, trip_name, country, trip_date, max_no_places, no_available_places)
     VALUES (v_trip_id_6a, 'Test wycieczki 6A', 'Polska', SYSDATE + 10, 5, 5);
 
     INSERT INTO trip (trip_id, trip_name, country, trip_date, max_no_places, no_available_places)
     VALUES (v_trip_id_6b, 'Test wycieczki 6B', 'Polska', SYSDATE + 10, 5, 5);
 
-    -- Dodajemy testowe osoby
     INSERT INTO person (person_id, firstname, lastname) 
     VALUES (v_person_id, 'TestUser1', 'Kowalski');
     
@@ -52,7 +49,6 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('[FAIL] Test 1: p_add_reservation_6a (Oczekiwano: 4, Otrzymano: ' || v_avail || ')');
     END IF;
 
-    -- Pobieramy ID właśnie dodanej rezerwacji
     SELECT reservation_id INTO v_res_id_6a 
     FROM reservation 
     WHERE trip_id = v_trip_id_6a AND person_id = v_person_id;
@@ -92,8 +88,6 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TRIGGER trg_reservation_insert_6b ENABLE';
     EXECUTE IMMEDIATE 'ALTER TRIGGER trg_reservation_update_6b ENABLE';
 
-    -- UWAGA: zakłada, że triggery z 6b są aktywne (trg_reservation_insert_6b, trg_reservation_update_6b)
-
     -- Test 5: Dodawanie rezerwacji z wykorzystaniem procedury 6b / triggerów 6b
     p_add_reservation_6b(v_trip_id_6b, v_person_id);
     SELECT no_available_places INTO v_avail FROM trip WHERE trip_id = v_trip_id_6b;
@@ -103,7 +97,6 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('[FAIL] Test 5: p_add_reservation_6b / trigger (Oczekiwano: 4, Otrzymano: ' || v_avail || ')');
     END IF;
 
-    -- Pobieramy ID właśnie dodanej rezerwacji
     SELECT reservation_id INTO v_res_id_6b 
     FROM reservation 
     WHERE trip_id = v_trip_id_6b AND person_id = v_person_id;
@@ -138,7 +131,6 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
     DBMS_OUTPUT.PUT_LINE('Testy zakończone. Trwa sprzątanie danych posiecznych...');
 
-    -- Sprzątanie (odwrócenie operacji w celu zachowania stanu bazy)
     DELETE FROM log WHERE reservation_id IN (v_res_id_6a, v_res_id_6b);
     DELETE FROM reservation WHERE reservation_id IN (v_res_id_6a, v_res_id_6b);
     DELETE FROM trip WHERE trip_id IN (v_trip_id_6a, v_trip_id_6b);
