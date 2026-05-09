@@ -24,11 +24,24 @@ const result3 = db.CustomerInfo.updateOne(
     { arrayFilters: [{ "order.OrderID": orderID3 }] }
 );
 
+const verification = {
+    orderdetails: db.orderdetails.find({ OrderID: orderID1 }).toArray(),
+    orderInfo: db.OrdersInfo.findOne(
+        { OrderID: orderID2 },
+        { _id: 0, OrderID: 1, "Orderdetails.ProductID": 1, "Orderdetails.Discount": 1 }
+    ),
+    customerInfo: db.CustomerInfo.findOne(
+        { CustomerID: "ALFKI", "Orders.OrderID": orderID3 },
+        { _id: 0, "Orders.$": 1 }
+    )
+};
+
 const results = {
     orderIDs: { orderID1, orderID2, orderID3 },
     query1: result1,
     query2: result2,
-    query3: result3
+    query3: result3,
+    verification
 };
 
 console.log("====== f ======");

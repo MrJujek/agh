@@ -53,6 +53,15 @@ const result3 = db.CustomerInfo.updateOne(
     }
 );
 
+const verification = {
+    order: db.orders.findOne({ OrderID: orderID1 }),
+    orderInfo: db.OrdersInfo.findOne({ OrderID: orderID2 }),
+    customerInfo: db.CustomerInfo.findOne(
+        { CustomerID: "ALFKI", "Orders.OrderID": orderID3 },
+        { _id: 0, "Orders.$": 1 }
+    )
+};
+
 const results = {
     orderDate,
     orderIDs: { orderID1, orderID2, orderID3 },
@@ -61,7 +70,8 @@ const results = {
         insertDetails: result1Details
     },
     query2: result2,
-    query3: result3
+    query3: result3,
+    verification
 };
 
 console.log("====== e ======");
