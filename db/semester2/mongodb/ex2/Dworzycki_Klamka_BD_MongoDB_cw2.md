@@ -2,7 +2,6 @@
 
 Ćwiczenie 2
 
-
 ---
 
 **Imiona i nazwiska autorów:** Julian Dworzycki, Radosław Klamka
@@ -11,7 +10,7 @@
 
 # Zadanie 1 - operacje wyszukiwania danych,  przetwarzanie dokumentów
 
-# a)
+## a)
 
 stwórz kolekcję  `OrdersInfo`  zawierającą następujące dane o zamówieniach
 - kolekcję  `OrdersInfo` należy stworzyć przekształcając dokumenty w oryginalnych kolekcjach `customers, orders, orderdetails, employees, shippers, products, categories, suppliers` do kolekcji  w której pojedynczy dokument opisuje jedno zamówienie
@@ -104,7 +103,7 @@ console.log(a_check);
 ```
 
 Rezultat:
-```js
+```json
 ====== a_check ======
 [
   {
@@ -205,7 +204,7 @@ Rezultat:
   }
 ]
 ```
-# b)
+## b)
 
 stwórz kolekcję  `CustomerInfo`  zawierającą następujące dane każdym kliencie
 - pojedynczy dokument opisuje jednego klienta
@@ -246,7 +245,7 @@ console.log("====== b_check ======");
 console.log(b_check);
 ```
 Rezultat:
-```js
+```json
 ====== b_check ======
 [
   {
@@ -560,7 +559,7 @@ Rezultat:
   }
 ]
 ```
-# c) 
+## c) 
 
 Napisz polecenie/zapytanie: Dla każdego klienta pokaż wartość zakupionych przez niego produktów z kategorii 'Confections'  w 1997r
 - Spróbuj napisać to zapytanie wykorzystując
@@ -622,7 +621,7 @@ var c_3 = db.CustomerInfo.aggregate([
 ```
 
 Wyniki są identyczne dla każdego sposobu. Korzystanie z OrdersInfo oraz CustomerInfo znacznie skraca polecenie, przy czym oba są bardzo do siebie podobne, sięgając do małej liczby dokumentów. Dzięki temu nie marnuje czasu na szukanie powiązań.
-```js
+```json
 ====== c_1 ======
 [
   {
@@ -651,8 +650,7 @@ Wyniki są identyczne dla każdego sposobu. Korzystanie z OrdersInfo oraz Custom
   }
 ]
 ```
-
-# d)
+## d)
 
 Napisz polecenie/zapytanie:  Dla każdego klienta podaje wartość sprzedaży z podziałem na lata i miesiące
 Spróbuj napisać to zapytanie wykorzystując
@@ -743,7 +741,7 @@ var d_3 = db.CustomerInfo.aggregate([
 ```
 
 Przykładowy fragment wyników, które są identyczne dla każdego wariantu polecenia. Odniesienie się do OrdersInfo lub CustomersInfo pozwala uniknąć łączenia się z innymi tabelami, dzięki czemu nie marnuje czasu na szukanie powiązań.
-```js
+```json
 ====== d_1 ======
 [
   {
@@ -793,8 +791,7 @@ Przykładowy fragment wyników, które są identyczne dla każdego wariantu pole
 ...
 ]
 ```
-
-# e)
+## e)
 
 Załóżmy że pojawia się nowe zamówienie dla klienta 'ALFKI',  zawierające dwa produkty 'Chai' oraz "Ikura"
 - pozostałe pola w zamówieniu (ceny, liczby sztuk prod, inf o przewoźniku itp. możesz uzupełnić wg własnego uznania)
@@ -864,7 +861,7 @@ const result3 = db.CustomerInfo.updateOne(
 ```
 
 Rezultat:
-```js
+```json
 verification: {
     order: {
       _id: ObjectId('6a007b01eeed8552deeaa928'),
@@ -931,8 +928,7 @@ verification: {
     }
   }
 ```
-
-# f)
+## f)
 
 Napisz polecenie które modyfikuje zamówienie dodane w pkt e) zwiększając zniżkę o 5% (dla każdej pozycji tego zamówienia) 
 
@@ -968,7 +964,7 @@ const result3 = db.CustomerInfo.updateOne(
 ```
 
 Rezultat:
-```js
+```json
 verification: {
     orderdetails: [
       {
@@ -1022,50 +1018,1898 @@ verification: {
 
 # Zadanie 2 - modelowanie danych
 
+Wybraliśmy przykład A:
+- Lecturers, courses, students, grades
+  - Lecturers run courses
+  - Students attend courses
+  - Lecturers assign grades to students
+  - Students rate courses
 
-Zaproponuj strukturę bazy danych dla wybranego/przykładowego zagadnienia/problemu
+## a) Trzy warianty, które rozważaliśmy:
 
-Należy wybrać jedno zagadnienie/problem (A lub B lub C)
+### Wariant A — Hybrydowy zrównoważony
 
-Przykład A
-- Wykładowcy, przedmioty, studenci, oceny
-	- Wykładowcy prowadzą zajęcia z poszczególnych przedmiotów
-	- Studenci uczęszczają na zajęcia
-	- Wykładowcy wystawiają oceny studentom
-	- Studenci oceniają zajęcia
+Separate collections for: lecturers (`lecturers`), students (`students`), courses (`courses`), grades (`grades`) and course_ratings (`course_ratings`). Both student and course may keep arrays `course_ids` / `students_ids` on their side.
 
-Przykład B
-- Firmy, wycieczki, osoby
-	- Firmy organizują wycieczki
-	- Osoby rezerwują miejsca/wykupują bilety
-	- Osoby oceniają wycieczki
+#### Zalety i wady tego rozwiązania
+- *Zalety*: jeden `$lookup` zamiast trzech dla typowych zapytań; dane statyczne (lista zapisanych) blisko przedmiotu; dane dynamiczne (oceny) osobno; skalowalne; naturalnie odzwierciedla sposób użycia systemu (profil studenta, karta przedmiotu, dziennik ocen to trzy różne widoki).
 
-Przykład C
-- Własny przykład o podobnym stopniu złożoności
-
-a) Zaproponuj  różne warianty struktury bazy danych i dokumentów w poszczególnych kolekcjach oraz przeprowadzić dyskusję każdego wariantu (wskazać wady i zalety każdego z wariantów)
-- zdefiniuj schemat/reguły walidacji danych
-- wykorzystaj referencje
-- dokumenty zagnieżdżone
-- tablice
-
-b) Kolekcje należy wypełnić przykładowymi danymi
-
-c) W kontekście zaprezentowania wad/zalet należy zaprezentować kilka przykładów/zapytań/operacji oraz dla których dedykowany jest dany wariant
-
-W sprawozdaniu należy zamieścić przykładowe dokumenty w formacie JSON ( pkt a) i b)), oraz kod zapytań/operacji (pkt c)), wraz z odpowiednim komentarzem opisującym strukturę dokumentów oraz polecenia ilustrujące wykonanie przykładowych operacji na danych
-
-Do sprawozdania należy dołączyć 
-- plik z kodem operacji/zapytań w wersji źródłowej (np. plik .js, np. plik .md ) 
-- oraz kompletny zrzut wykonanych/przygotowanych baz danych (taki zrzut można wykonać np. za pomocą poleceń `mongoexport`, `mongdump` …)  
-	- załącznik ze zrzutem baz powinien mieć format zip
-
-## Zadanie 2  - rozwiązanie
-
-> Wyniki: 
-> 
-> przykłady, kod, zrzuty ekranów, komentarz ...
+- *Wady*: przy zapisie/wypisaniu studenta trzeba zaktualizować dwa miejsca (przedmiot + student); drobna redundancja `courses_ids` u studenta.
 
 ```js
---  ...
+// Lecturers Collection
+db.createCollection("lecturers", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "first_name", "last_name", "email" ],
+         properties: {
+            first_name: { bsonType: "string" },
+            last_name: { bsonType: "string" },
+            email: { bsonType: "string" },
+            department: { bsonType: "string" }
+         }
+      }
+   }
+});
+
+// Students Collection (contains array of course_ids - controlled redundancy)
+db.createCollection("students", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "first_name", "last_name", "student_id" ],
+         properties: {
+            first_name: { bsonType: "string" },
+            last_name: { bsonType: "string" },
+            student_id: { bsonType: "string" },
+            email: { bsonType: "string" },
+            course_ids: {
+               bsonType: "array",
+               items: { bsonType: "objectId" },
+               description: "Array of ObjectIds - enrolled courses"
+            }
+         }
+      }
+   }
+});
+
+// Courses Collection (contains enrolled_students array - controlled redundancy)
+db.createCollection("courses", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "name", "lecturer_id", "enrolled_students" ],
+         properties: {
+            name: { bsonType: "string" },
+            lecturer_id: { bsonType: "objectId" },
+            semester: { bsonType: "int" },
+            credits: { bsonType: "int" },
+            enrolled_students: {
+               bsonType: "array",
+               items: {
+                  bsonType: "object",
+                  required: [ "student_id", "student_number" ],
+                  properties: {
+                     student_id: { bsonType: "objectId" },
+                     student_number: { bsonType: "string" }
+                  }
+               }
+            }
+         }
+      }
+   }
+});
+
+// Grades Collection (separate - dynamic data)
+db.createCollection("grades", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "student_id", "course_id", "grade", "date" ],
+         properties: {
+            student_id: { bsonType: "objectId" },
+            course_id: { bsonType: "objectId" },
+            grade: { bsonType: "double" },
+            date: { bsonType: "date" }
+         }
+      }
+   }
+});
+
+// Course Ratings Collection (separate - dynamic data)
+db.createCollection("course_ratings", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "student_id", "course_id", "rating" ],
+         properties: {
+            student_id: { bsonType: "objectId" },
+            course_id: { bsonType: "objectId" },
+            rating: { bsonType: "int" },
+            comment: { bsonType: "string" },
+            date: { bsonType: "date" }
+         }
+      }
+   }
+});
+```
+
+### Wariant B — Czyste referencje (podejście relacyjne)
+
+Five collections without nesting: lecturers (`lecturers`), students (`students`), courses (`courses`), grades (`grades`) and course_ratings (`course_ratings`). The student–course relation can be implemented via an enrollments collection. Documents are linked by `_id`.
+#### Zalety i wady tego rozwiązania
+
+- *Zalety*: brak redundancji; zmiana danych w jednym miejscu; prosta walidacja każdej kolekcji z osobna.
+
+- *Wady*: każdy sensowny widok wymaga 2–4 `$lookup`; tracimy główną zaletę dokumentowej bazy danych; agregacje są ciężkie i przez to słabo czytelne; brak indeksów to katastrofa wydajnościowa.
+
+```js
+// Lecturers Collection
+db.createCollection("lecturers", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "first_name", "last_name", "email" ],
+         properties: {
+            first_name: { bsonType: "string" },
+            last_name: { bsonType: "string" },
+            email: { bsonType: "string" },
+            department: { bsonType: "string" }
+         }
+      }
+   }
+});
+
+// Students Collection (no courses_ids array)
+db.createCollection("students", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "first_name", "last_name", "student_id" ],
+         properties: {
+            first_name: { bsonType: "string" },
+            last_name: { bsonType: "string" },
+            student_id: { bsonType: "string" },
+            email: { bsonType: "string" }
+         }
+      }
+   }
+});
+
+// Courses Collection (no enrolled_students array)
+db.createCollection("courses", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "name", "lecturer_id" ],
+         properties: {
+            name: { bsonType: "string" },
+            lecturer_id: { bsonType: "objectId" },
+            semester: { bsonType: "int" },
+            credits: { bsonType: "int" }
+         }
+      }
+   }
+});
+
+// Enrollments Collection (join table for student-course relationship)
+db.createCollection("enrollments", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "student_id", "course_id", "enrollment_date" ],
+         properties: {
+            student_id: { bsonType: "objectId" },
+            course_id: { bsonType: "objectId" },
+            enrollment_date: { bsonType: "date" }
+         }
+      }
+   }
+});
+
+// Grades Collection
+db.createCollection("grades", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "student_id", "course_id", "grade", "date" ],
+         properties: {
+            student_id: { bsonType: "objectId" },
+            course_id: { bsonType: "objectId" },
+            grade: { bsonType: "double" },
+            date: { bsonType: "date" }
+         }
+      }
+   }
+});
+
+// Course Ratings Collection
+db.createCollection("course_ratings", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "student_id", "course_id", "rating" ],
+         properties: {
+            student_id: { bsonType: "objectId" },
+            course_id: { bsonType: "objectId" },
+            rating: { bsonType: "int" },
+            comment: { bsonType: "string" },
+            date: { bsonType: "date" }
+         }
+      }
+   }
+});
+```
+
+### Wariant C — Hybrydowy skrzywiony ku zagnieżdżeniu
+
+Podobnie do wariantu A, ale zamiast osobnej kolekcji `grades` — oceny są zagnieżdżone bezpośrednio w dokumencie przedmiotu jako tablica { `student_id`, `grade`, `date` }. Oceny zajęć zagnieżdżone w dokumencie studenta.
+
+#### Zalety i wady tego rozwiązania
+
+- *Zalety*: karta przedmiotu z ocenami to jeden dokument; dla małych grup łatwy odczyt i zapis oceny.
+
+- *Wady*: dokument przedmiotu rośnie z każdą oceną i opinią — problem przy dużych grupach; aktualizacja pojedynczej oceny wymaga operatora `$[]` z arrayFilters; agregacja "wszystkie oceny studenta" wymaga `$lookup` lub `$unwind` przez wszystkie przedmioty; historia poprawek ocen trudna do śledzenia. W systemie z kilkuset studentami per przedmiot to zły pomysł.
+
+```js
+// Lecturers Collection
+db.createCollection("lecturers", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "first_name", "last_name", "email" ],
+         properties: {
+            first_name: { bsonType: "string" },
+            last_name: { bsonType: "string" },
+            email: { bsonType: "string" },
+            department: { bsonType: "string" }
+         }
+      }
+   }
+});
+
+// Students Collection (contains course_ids array + nested course_ratings)
+db.createCollection("students", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "first_name", "last_name", "student_id" ],
+         properties: {
+            first_name: { bsonType: "string" },
+            last_name: { bsonType: "string" },
+            student_id: { bsonType: "string" },
+            email: { bsonType: "string" },
+            course_ids: {
+               bsonType: "array",
+               items: { bsonType: "objectId" }
+            },
+            course_ratings: { // Nested ratings given by student to courses
+               bsonType: "array",
+               items: {
+                  bsonType: "object",
+                  required: [ "course_id", "rating" ],
+                  properties: {
+                     course_id: { bsonType: "objectId" },
+                     rating: { bsonType: "int" },
+                     comment: { bsonType: "string" },
+                     date: { bsonType: "date" }
+                  }
+               }
+            }
+         }
+      }
+   }
+});
+
+// Courses Collection (contains enrolled_students array + nested grades)
+db.createCollection("courses", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "name", "lecturer_id", "enrolled_students" ],
+         properties: {
+            name: { bsonType: "string" },
+            lecturer_id: { bsonType: "objectId" },
+            semester: { bsonType: "int" },
+            credits: { bsonType: "int" },
+            enrolled_students: {
+               bsonType: "array",
+               items: {
+                  bsonType: "object",
+                  required: [ "student_id", "student_number" ],
+                  properties: {
+                     student_id: { bsonType: "objectId" },
+                     student_number: { bsonType: "string" }
+                  }
+               }
+            },
+            grades: { // Nested grades assigned to students in this course
+               bsonType: "array",
+               items: {
+                  bsonType: "object",
+                  required: [ "student_id", "grade", "date" ],
+                  properties: {
+                     student_id: { bsonType: "objectId" },
+                     grade: { bsonType: "double" },
+                     date: { bsonType: "date" }
+                  }
+               }
+            }
+         }
+      }
+   }
+});
+```
+
+## b) Wypełnianie kolekcji
+
+### Wariant A
+
+```js
+const lecturerId = new ObjectId();
+const studentId1 = new ObjectId();
+const studentId2 = new ObjectId();
+const courseId1 = new ObjectId();
+const courseId2 = new ObjectId();
+
+// Insert lecturer
+db.lecturers.insertOne({
+   _id: lecturerId,
+   first_name: "John",
+   last_name: "Smith",
+   email: "john.smith@university.edu",
+   department: "Mathematics"
+});
+
+// Insert students
+db.students.insertMany([
+   {
+      _id: studentId1,
+      first_name: "Alice",
+      last_name: "Johnson",
+      student_id: "S12345",
+      email: "alice.johnson@student.edu",
+      course_ids: [ courseId1, courseId2 ]
+   },
+   {
+      _id: studentId2,
+      first_name: "Bob",
+      last_name: "Williams",
+      student_id: "S12346",
+      email: "bob.williams@student.edu",
+      course_ids: [ courseId1 ]
+   }
+]);
+
+// Insert courses
+db.courses.insertMany([
+   {
+      _id: courseId1,
+      name: "Discrete Mathematics",
+      lecturer_id: lecturerId,
+      semester: 1,
+      credits: 5,
+      enrolled_students: [
+         { student_id: studentId1, student_number: "S12345" },
+         { student_id: studentId2, student_number: "S12346" }
+      ]
+   },
+   {
+      _id: courseId2,
+      name: "Data Structures",
+      lecturer_id: lecturerId,
+      semester: 2,
+      credits: 4,
+      enrolled_students: [
+         { student_id: studentId1, student_number: "S12345" }
+      ]
+   }
+]);
+
+// Insert grades
+db.grades.insertMany([
+   {
+      student_id: studentId1,
+      course_id: courseId1,
+      grade: 4.5,
+      date: new Date("2025-12-15")
+   },
+   {
+      student_id: studentId2,
+      course_id: courseId1,
+      grade: 3.8,
+      date: new Date("2025-12-15")
+   },
+   {
+      student_id: studentId1,
+      course_id: courseId2,
+      grade: 4.2,
+      date: new Date("2025-12-16")
+   }
+]);
+
+// Insert course ratings
+db.course_ratings.insertMany([
+   {
+      student_id: studentId1,
+      course_id: courseId1,
+      rating: 5,
+      comment: "Excellent course!",
+      date: new Date("2025-12-20")
+   },
+   {
+      student_id: studentId2,
+      course_id: courseId1,
+      rating: 4,
+      comment: "Good content",
+      date: new Date("2025-12-20")
+   }
+]);
+```
+
+### Wariant B
+
+```js
+const lecturerId = new ObjectId();
+const studentId1 = new ObjectId();
+const studentId2 = new ObjectId();
+const courseId = new ObjectId();
+const courseId2 = new ObjectId();
+
+// Insert lecturer
+db.lecturers.insertOne({
+   _id: lecturerId,
+   first_name: "John",
+   last_name: "Smith",
+   email: "john.smith@university.edu",
+   department: "Mathematics"
+});
+
+// Insert students
+db.students.insertMany([
+   {
+      _id: studentId1,
+      first_name: "Alice",
+      last_name: "Johnson",
+      student_id: "S12345",
+      email: "alice.johnson@student.edu"
+   },
+   {
+      _id: studentId2,
+      first_name: "Bob",
+      last_name: "Williams",
+      student_id: "S12346",
+      email: "bob.williams@student.edu"
+   }
+]);
+
+// Insert courses
+db.courses.insertMany([
+   {
+      _id: courseId,
+      name: "Discrete Mathematics",
+      lecturer_id: lecturerId,
+      semester: 1,
+      credits: 5
+   },
+   {
+      _id: courseId2,
+      name: "Linear Algebra",
+      lecturer_id: lecturerId,
+      semester: 2,
+      credits: 5
+   }
+]);
+
+// Insert enrollments
+db.enrollments.insertMany([
+   {
+      student_id: studentId1,
+      course_id: courseId,
+      enrollment_date: new Date("2025-09-01")
+   },
+   {
+      student_id: studentId2,
+      course_id: courseId,
+      enrollment_date: new Date("2025-09-01")
+   }
+]);
+
+// Insert grades
+db.grades.insertMany([
+   {
+      student_id: studentId1,
+      course_id: courseId,
+      grade: 4.5,
+      date: new Date("2025-12-15")
+   },
+   {
+      student_id: studentId2,
+      course_id: courseId,
+      grade: 3.8,
+      date: new Date("2025-12-15")
+   }
+]);
+
+// Insert course ratings
+db.course_ratings.insertMany([
+   {
+      student_id: studentId1,
+      course_id: courseId,
+      rating: 5,
+      comment: "Excellent course!",
+      date: new Date("2025-12-20")
+   },
+   {
+      student_id: studentId2,
+      course_id: courseId,
+      rating: 4,
+      comment: "Good content",
+      date: new Date("2025-12-20")
+   }
+]);
+```
+
+### Wariant C
+
+```js
+const lecturerId = new ObjectId();
+const studentId1 = new ObjectId();
+const studentId2 = new ObjectId();
+const courseId1 = new ObjectId();
+const courseId2 = new ObjectId();
+
+// Insert lecturer
+db.lecturers.insertOne({
+   _id: lecturerId,
+   first_name: "John",
+   last_name: "Smith",
+   email: "john.smith@university.edu",
+   department: "Mathematics"
+});
+
+// Insert students
+db.students.insertMany([
+   {
+      _id: studentId1,
+      first_name: "Alice",
+      last_name: "Johnson",
+      student_id: "S12345",
+      email: "alice.johnson@student.edu",
+      course_ids: [ courseId1, courseId2 ],
+      course_ratings: [
+         {
+            course_id: courseId1,
+            rating: 5,
+            comment: "Excellent course!",
+            date: new Date("2025-12-20")
+         },
+         {
+            course_id: courseId2,
+            rating: 4,
+            comment: "Good, but challenging",
+            date: new Date("2025-12-21")
+         }
+      ]
+   },
+   {
+      _id: studentId2,
+      first_name: "Bob",
+      last_name: "Williams",
+      student_id: "S12346",
+      email: "bob.williams@student.edu",
+      course_ids: [ courseId1 ],
+      course_ratings: [
+         {
+            course_id: courseId1,
+            rating: 4,
+            comment: "Good content",
+            date: new Date("2025-12-20")
+         }
+      ]
+   }
+]);
+
+// Insert courses with nested grades
+db.courses.insertMany([
+   {
+      _id: courseId1,
+      name: "Discrete Mathematics",
+      lecturer_id: lecturerId,
+      semester: 1,
+      credits: 5,
+      enrolled_students: [
+         { student_id: studentId1, student_number: "S12345" },
+         { student_id: studentId2, student_number: "S12346" }
+      ],
+      grades: [
+         {
+            student_id: studentId1,
+            grade: 4.5,
+            date: new Date("2025-12-15")
+         },
+         {
+            student_id: studentId2,
+            grade: 3.8,
+            date: new Date("2025-12-15")
+         }
+      ]
+   },
+   {
+      _id: courseId2,
+      name: "Data Structures",
+      lecturer_id: lecturerId,
+      semester: 2,
+      credits: 4,
+      enrolled_students: [
+         { student_id: studentId1, student_number: "S12345" }
+      ],
+      grades: [
+         {
+            student_id: studentId1,
+            grade: 4.2,
+            date: new Date("2025-12-16")
+         }
+      ]
+   }
+]);
+```
+
+## c) Zapytania ukazujące wady i zalety danego wariantu
+
+### Wariant A
+```js
+// Query 1: Get course attendance list (advantage: single document read)
+console.log("\n========== ADVANTAGE 1: Course Attendance List (Single Document) ==========");
+const query1Result = db.courses.findOne({ _id: courseId1 });
+console.log(JSON.stringify(query1Result, null, 2));
+
+// Query 2: Get student enrolled courses (single lookup - efficient)
+console.log("\n========== ADVANTAGE 2: Student with Enrolled Courses (Only 1 Lookup) ==========");
+const query2Result = db.students.aggregate([
+    { $match: { _id: studentId1 } },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "course_ids",
+            foreignField: "_id",
+            as: "course_details"
+        }
+    },
+    {
+        $lookup: {
+            from: "lecturers",
+            localField: "course_details.lecturer_id",
+            foreignField: "_id",
+            as: "lecturer_info"
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query2Result, null, 2));
+
+// Query 3: Get course ratings (simple queries with references)
+console.log("\n========== ADVANTAGE 3: Course Ratings (Simple Structure) ==========");
+const query3Result = db.course_ratings.aggregate([
+    { $match: { course_id: courseId1 } },
+    {
+        $lookup: {
+            from: "students",
+            localField: "student_id",
+            foreignField: "_id",
+            as: "student_info"
+        }
+    },
+    { $unwind: "$student_info" },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "course_id",
+            foreignField: "_id",
+            as: "course_info"
+        }
+    },
+    { $unwind: "$course_info" },
+    {
+        $project: {
+            _id: 0,
+            course: "$course_info.name",
+            student: { $concat: ["$student_info.first_name", " ", "$student_info.last_name"] },
+            rating: 1,
+            comment: 1
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query3Result, null, 2));
+
+// ========== DISADVANTAGES OF VARIANT A ==========
+
+// Query 4: Get student grades with course details (requires joins)
+console.log("\n========== DISADVANTAGE 1: Student Grades (Requires Joins) ==========");
+const query4Result = db.students.aggregate([
+    { $match: { _id: studentId1 } },
+    {
+        $lookup: {
+            from: "grades",
+            localField: "_id",
+            foreignField: "student_id",
+            as: "grades"
+        }
+    },
+    { $unwind: "$grades" },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "grades.course_id",
+            foreignField: "_id",
+            as: "course_info"
+        }
+    },
+    { $unwind: "$course_info" },
+    {
+        $project: {
+            _id: 0,
+            student_name: { $concat: ["$first_name", " ", "$last_name"] },
+            course_name: "$course_info.name",
+            grade: "$grades.grade"
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query4Result, null, 2));
+
+// Query 5: Get course with all students and their grades (complex aggregation)
+console.log("\n========== DISADVANTAGE 2: Course with Students and Grades (Complex) ==========");
+const query5Result = db.courses.aggregate([
+    { $match: { _id: courseId1 } },
+    {
+        $lookup: {
+            from: "lecturers",
+            localField: "lecturer_id",
+            foreignField: "_id",
+            as: "lecturer"
+        }
+    },
+    { $unwind: "$lecturer" },
+    {
+        $lookup: {
+            from: "grades",
+            localField: "_id",
+            foreignField: "course_id",
+            as: "grades_data"
+        }
+    },
+    {
+        $lookup: {
+            from: "students",
+            let: { student_id: "$enrolled_students.student_id" },
+            pipeline: [
+                { $match: { $expr: { $in: ["$_id", "$$student_id"] } } }
+            ],
+            as: "student_details"
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query5Result, null, 2));
+
+// Query 6: Enroll student to course (DISADVANTAGE: requires 2 updates - maintain consistency)
+console.log("\n========== DISADVANTAGE 3: Enroll Student to Course (2 Updates Required) ==========");
+const enrollResult1 = db.students.updateOne(
+    { _id: studentId2 },
+    { $push: { course_ids: courseId2 } }
+);
+console.log("Update 1 - Add course to student:");
+console.log(JSON.stringify(enrollResult1, null, 2));
+
+const enrollResult2 = db.courses.updateOne(
+    { _id: courseId2 },
+    { $push: { enrolled_students: { student_id: studentId2, student_number: "S12346" } } }
+);
+console.log("Update 2 - Add student to course (MUST keep both in sync):");
+console.log(JSON.stringify(enrollResult2, null, 2));
+
+// Query 7: Unenroll student from course (DISADVANTAGE: requires 2 updates - maintain consistency)
+console.log("\n========== DISADVANTAGE 4: Unenroll Student from Course (2 Updates Required) ==========");
+const unenrollResult1 = db.students.updateOne(
+    { _id: studentId2 },
+    { $pull: { course_ids: courseId1 } }
+);
+console.log("Update 1 - Remove course from student:");
+console.log(JSON.stringify(unenrollResult1, null, 2));
+
+const unenrollResult2 = db.courses.updateOne(
+    { _id: courseId1 },
+    { $pull: { enrolled_students: { student_id: studentId2 } } }
+);
+console.log("Update 2 - Remove student from course (MUST keep both in sync):");
+console.log(JSON.stringify(unenrollResult2, null, 2));
+```
+
+Rezultat:
+```json
+========== ADVANTAGE 1: Course Attendance List (Single Document) ==========
+{
+  "_id": "6a00b9163cbd1fa73ace2135",
+  "name": "Discrete Mathematics",
+  "lecturer_id": "6a00b9163cbd1fa73ace2132",
+  "semester": 1,
+  "credits": 5,
+  "enrolled_students": [
+    {
+      "student_id": "6a00b9163cbd1fa73ace2133",
+      "student_number": "S12345"
+    },
+    {
+      "student_id": "6a00b9163cbd1fa73ace2134",
+      "student_number": "S12346"
+    }
+  ]
+}
+
+========== ADVANTAGE 2: Student with Enrolled Courses (Only 1 Lookup) ==========
+[
+  {
+    "_id": "6a00b9163cbd1fa73ace2133",
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "student_id": "S12345",
+    "email": "alice.johnson@student.edu",
+    "course_ids": [
+      "6a00b9163cbd1fa73ace2135",
+      "6a00b9163cbd1fa73ace2136"
+    ],
+    "course_details": [
+      {
+        "_id": "6a00b9163cbd1fa73ace2135",
+        "name": "Discrete Mathematics",
+        "lecturer_id": "6a00b9163cbd1fa73ace2132",
+        "semester": 1,
+        "credits": 5,
+        "enrolled_students": [
+          {
+            "student_id": "6a00b9163cbd1fa73ace2133",
+            "student_number": "S12345"
+          },
+          {
+            "student_id": "6a00b9163cbd1fa73ace2134",
+            "student_number": "S12346"
+          }
+        ]
+      },
+      {
+        "_id": "6a00b9163cbd1fa73ace2136",
+        "name": "Data Structures",
+        "lecturer_id": "6a00b9163cbd1fa73ace2132",
+        "semester": 2,
+        "credits": 4,
+        "enrolled_students": [
+          {
+            "student_id": "6a00b9163cbd1fa73ace2133",
+            "student_number": "S12345"
+          }
+        ]
+      }
+    ],
+    "lecturer_info": [
+      {
+        "_id": "6a00b9163cbd1fa73ace2132",
+        "first_name": "John",
+        "last_name": "Smith",
+        "email": "john.smith@university.edu",
+        "department": "Mathematics"
+      }
+    ]
+  }
+]
+
+========== ADVANTAGE 3: Course Ratings (Simple Structure) ==========
+[
+  {
+    "rating": 5,
+    "comment": "Excellent course!",
+    "course": "Discrete Mathematics",
+    "student": "Alice Johnson"
+  },
+  {
+    "rating": 4,
+    "comment": "Good content",
+    "course": "Discrete Mathematics",
+    "student": "Bob Williams"
+  }
+]
+
+========== DISADVANTAGE 1: Student Grades (Requires Joins) ==========
+[
+  {
+    "student_name": "Alice Johnson",
+    "course_name": "Discrete Mathematics",
+    "grade": 4.5
+  },
+  {
+    "student_name": "Alice Johnson",
+    "course_name": "Data Structures",
+    "grade": 4.2
+  }
+]
+
+========== DISADVANTAGE 2: Course with Students and Grades (Complex) ==========
+[
+  {
+    "_id": "6a00b9163cbd1fa73ace2135",
+    "name": "Discrete Mathematics",
+    "lecturer_id": "6a00b9163cbd1fa73ace2132",
+    "semester": 1,
+    "credits": 5,
+    "enrolled_students": [
+      {
+        "student_id": "6a00b9163cbd1fa73ace2133",
+        "student_number": "S12345"
+      },
+      {
+        "student_id": "6a00b9163cbd1fa73ace2134",
+        "student_number": "S12346"
+      }
+    ],
+    "lecturer": {
+      "_id": "6a00b9163cbd1fa73ace2132",
+      "first_name": "John",
+      "last_name": "Smith",
+      "email": "john.smith@university.edu",
+      "department": "Mathematics"
+    },
+    "grades_data": [
+      {
+        "_id": "6a00b9163cbd1fa73ace2137",
+        "student_id": "6a00b9163cbd1fa73ace2133",
+        "course_id": "6a00b9163cbd1fa73ace2135",
+        "grade": 4.5,
+        "date": "2025-12-15T00:00:00.000Z"
+      },
+      {
+        "_id": "6a00b9163cbd1fa73ace2138",
+        "student_id": "6a00b9163cbd1fa73ace2134",
+        "course_id": "6a00b9163cbd1fa73ace2135",
+        "grade": 3.8,
+        "date": "2025-12-15T00:00:00.000Z"
+      }
+    ],
+    "student_details": [
+      {
+        "_id": "6a00b9163cbd1fa73ace2133",
+        "first_name": "Alice",
+        "last_name": "Johnson",
+        "student_id": "S12345",
+        "email": "alice.johnson@student.edu",
+        "course_ids": [
+          "6a00b9163cbd1fa73ace2135",
+          "6a00b9163cbd1fa73ace2136"
+        ]
+      },
+      {
+        "_id": "6a00b9163cbd1fa73ace2134",
+        "first_name": "Bob",
+        "last_name": "Williams",
+        "student_id": "S12346",
+        "email": "bob.williams@student.edu",
+        "course_ids": [
+          "6a00b9163cbd1fa73ace2135"
+        ]
+      }
+    ]
+  }
+]
+
+========== DISADVANTAGE 3: Enroll Student to Course (2 Updates Required) ==========
+Update 1 - Add course to student:
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+Update 2 - Add student to course (MUST keep both in sync):
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+
+========== DISADVANTAGE 4: Unenroll Student from Course (2 Updates Required) ==========
+Update 1 - Remove course from student:
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+Update 2 - Remove student from course (MUST keep both in sync):
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+
+```
+
+### Wariant B
+```js
+
+// Query 1: Enroll student to course (advantage: single insert, no consistency issues)
+console.log("\n========== ADVANTAGE 1: Enroll Student to Course (Single Insert) ==========");
+const enrollResult = db.enrollments.insertOne({
+    student_id: studentId1,
+    course_id: courseId2,
+    enrollment_date: new Date()
+});
+console.log("Single Insert - No synchronization needed:");
+console.log(JSON.stringify(enrollResult, null, 2));
+
+// Query 2: Unenroll student from course (advantage: single delete, no consistency issues)
+console.log("\n========== ADVANTAGE 2: Unenroll Student from Course (Single Delete) ==========");
+const unenrollResult = db.enrollments.deleteOne({
+    student_id: studentId1,
+    course_id: courseId2
+});
+console.log("Single Delete - No synchronization needed:");
+console.log(JSON.stringify(unenrollResult, null, 2));
+
+// Query 3: No redundancy - data in one place
+console.log("\n========== ADVANTAGE 3: No Data Redundancy (Pure References) ==========");
+console.log("All relations stored in separate, normalized collections:");
+console.log("- Students are just student info");
+console.log("- Courses are just course info");
+console.log("- Enrollments keep the relationship");
+console.log("- Grades are separate");
+console.log("- Course ratings are separate");
+
+// ========== DISADVANTAGES OF VARIANT B ==========
+
+// Query 4: Get student profile with enrolled courses (many lookups)
+console.log("\n========== DISADVANTAGE 1: Student Profile with Enrolled Courses (3 Lookups) ==========");
+const query1Result = db.students.aggregate([
+    { $match: { _id: studentId1 } },
+    {
+        $lookup: {
+            from: "enrollments",
+            localField: "_id",
+            foreignField: "student_id",
+            as: "my_enrollments"
+        }
+    },
+    { $unwind: "$my_enrollments" },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "my_enrollments.course_id",
+            foreignField: "_id",
+            as: "course_details"
+        }
+    },
+    { $unwind: "$course_details" },
+    {
+        $lookup: {
+            from: "lecturers",
+            localField: "course_details.lecturer_id",
+            foreignField: "_id",
+            as: "lecturer_details"
+        }
+    },
+    { $unwind: "$lecturer_details" }
+]).toArray();
+
+console.log(JSON.stringify(query1Result, null, 2));
+
+// Query 5: Get student grades for all courses (many lookups)
+console.log("\n========== DISADVANTAGE 2: Student Grades for All Courses (Multiple Lookups) ==========");
+const query5Result = db.students.aggregate([
+    { $match: { _id: studentId1 } },
+    {
+        $lookup: {
+            from: "grades",
+            localField: "_id",
+            foreignField: "student_id",
+            as: "grades"
+        }
+    },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "grades.course_id",
+            foreignField: "_id",
+            as: "course_details"
+        }
+    }
+]).toArray();
+
+console.log(JSON.stringify(query5Result, null, 2));
+
+// Query 6: Get course with all enrolled students and their grades (many lookups)
+console.log("\n========== DISADVANTAGE 3: Course with Enrolled Students and Grades (4 Lookups) ==========");
+const query6Result = db.courses.aggregate([
+    { $match: { _id: courseId } },
+    {
+        $lookup: {
+            from: "lecturers",
+            localField: "lecturer_id",
+            foreignField: "_id",
+            as: "lecturer"
+        }
+    },
+    { $unwind: "$lecturer" },
+    {
+        $lookup: {
+            from: "enrollments",
+            localField: "_id",
+            foreignField: "course_id",
+            as: "enrollments"
+        }
+    },
+    { $unwind: "$enrollments" },
+    {
+        $lookup: {
+            from: "students",
+            localField: "enrollments.student_id",
+            foreignField: "_id",
+            as: "student_info"
+        }
+    },
+    { $unwind: "$student_info" },
+    {
+        $lookup: {
+            from: "grades",
+            let: { student: "$student_info._id", course: "$_id" },
+            pipeline: [
+                { $match: { $expr: { $and: [{ $eq: ["$student_id", "$$student"] }, { $eq: ["$course_id", "$$course"] }] } } }
+            ],
+            as: "student_grades"
+        }
+    }
+]).toArray();
+
+console.log(JSON.stringify(query6Result, null, 2));
+
+// Query 7: Get course ratings for a course (multiple lookups)
+console.log("\n========== DISADVANTAGE 4: Course Ratings (Multiple Lookups) ==========");
+const query7Result = db.course_ratings.aggregate([
+    { $match: { course_id: courseId } },
+    {
+        $lookup: {
+            from: "students",
+            localField: "student_id",
+            foreignField: "_id",
+            as: "student_info"
+        }
+    },
+    { $unwind: "$student_info" },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "course_id",
+            foreignField: "_id",
+            as: "course_info"
+        }
+    },
+    { $unwind: "$course_info" }
+]).toArray();
+
+console.log(JSON.stringify(query7Result, null, 2));
+
+// Query 8: Get attendance list for a course (many lookups)
+console.log("\n========== DISADVANTAGE 5: Course Attendance List (Multiple Lookups) ==========");
+const query8Result = db.courses.aggregate([
+    { $match: { _id: courseId } },
+    {
+        $lookup: {
+            from: "lecturers",
+            localField: "lecturer_id",
+            foreignField: "_id",
+            as: "lecturer_info"
+        }
+    },
+    { $unwind: "$lecturer_info" },
+    {
+        $lookup: {
+            from: "enrollments",
+            localField: "_id",
+            foreignField: "course_id",
+            as: "enrollments_data"
+        }
+    },
+    {
+        $lookup: {
+            from: "students",
+            let: { student_id: "$enrollments_data.student_id" },
+            pipeline: [
+                { $match: { $expr: { $in: ["$_id", "$$student_id"] } } }
+            ],
+            as: "student_list"
+        }
+    }
+]).toArray();
+
+console.log(JSON.stringify(query8Result, null, 2));
+
+// Query 9: Average grade per course (many lookups)
+console.log("\n========== DISADVANTAGE 6: Course Average Grade (Aggregation with Lookups) ==========");
+const query9Result = db.grades.aggregate([
+    { $match: { course_id: courseId } },
+    {
+        $group: {
+            _id: "$course_id",
+            average_grade: { $avg: "$grade" },
+            total_grades: { $sum: 1 }
+        }
+    },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "_id",
+            foreignField: "_id",
+            as: "course_info"
+        }
+    },
+    { $unwind: "$course_info" },
+    {
+        $project: {
+            _id: 0,
+            course_name: "$course_info.name",
+            average_grade: 1,
+            total_grades: 1
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query9Result, null, 2));
+```
+
+Rezultat:
+```json
+
+========== ADVANTAGE 1: Enroll Student to Course (Single Insert) ==========
+Single Insert - No synchronization needed:
+{
+  "acknowledged": true,
+  "insertedId": "6a00b951e2019c8480631c10"
+}
+
+========== ADVANTAGE 2: Unenroll Student from Course (Single Delete) ==========
+Single Delete - No synchronization needed:
+{
+  "acknowledged": true,
+  "deletedCount": 1
+}
+
+========== ADVANTAGE 3: No Data Redundancy (Pure References) ==========
+All relations stored in separate, normalized collections:
+- Students are just student info
+- Courses are just course info
+- Enrollments keep the relationship
+- Grades are separate
+- Course ratings are separate
+
+========== DISADVANTAGE 1: Student Profile with Enrolled Courses (3 Lookups) ==========
+[
+  {
+    "_id": "6a00b951e2019c8480631c06",
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "student_id": "S12345",
+    "email": "alice.johnson@student.edu",
+    "my_enrollments": {
+      "_id": "6a00b951e2019c8480631c0a",
+      "student_id": "6a00b951e2019c8480631c06",
+      "course_id": "6a00b951e2019c8480631c08",
+      "enrollment_date": "2025-09-01T00:00:00.000Z"
+    },
+    "course_details": {
+      "_id": "6a00b951e2019c8480631c08",
+      "name": "Discrete Mathematics",
+      "lecturer_id": "6a00b951e2019c8480631c05",
+      "semester": 1,
+      "credits": 5
+    },
+    "lecturer_details": {
+      "_id": "6a00b951e2019c8480631c05",
+      "first_name": "John",
+      "last_name": "Smith",
+      "email": "john.smith@university.edu",
+      "department": "Mathematics"
+    }
+  }
+]
+
+========== DISADVANTAGE 2: Student Grades for All Courses (Multiple Lookups) ==========
+[
+  {
+    "_id": "6a00b951e2019c8480631c06",
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "student_id": "S12345",
+    "email": "alice.johnson@student.edu",
+    "grades": [
+      {
+        "_id": "6a00b951e2019c8480631c0c",
+        "student_id": "6a00b951e2019c8480631c06",
+        "course_id": "6a00b951e2019c8480631c08",
+        "grade": 4.5,
+        "date": "2025-12-15T00:00:00.000Z"
+      }
+    ],
+    "course_details": [
+      {
+        "_id": "6a00b951e2019c8480631c08",
+        "name": "Discrete Mathematics",
+        "lecturer_id": "6a00b951e2019c8480631c05",
+        "semester": 1,
+        "credits": 5
+      }
+    ]
+  }
+]
+
+========== DISADVANTAGE 3: Course with Enrolled Students and Grades (4 Lookups) ==========
+[
+  {
+    "_id": "6a00b951e2019c8480631c08",
+    "name": "Discrete Mathematics",
+    "lecturer_id": "6a00b951e2019c8480631c05",
+    "semester": 1,
+    "credits": 5,
+    "lecturer": {
+      "_id": "6a00b951e2019c8480631c05",
+      "first_name": "John",
+      "last_name": "Smith",
+      "email": "john.smith@university.edu",
+      "department": "Mathematics"
+    },
+    "enrollments": {
+      "_id": "6a00b951e2019c8480631c0a",
+      "student_id": "6a00b951e2019c8480631c06",
+      "course_id": "6a00b951e2019c8480631c08",
+      "enrollment_date": "2025-09-01T00:00:00.000Z"
+    },
+    "student_info": {
+      "_id": "6a00b951e2019c8480631c06",
+      "first_name": "Alice",
+      "last_name": "Johnson",
+      "student_id": "S12345",
+      "email": "alice.johnson@student.edu"
+    },
+    "student_grades": [
+      {
+        "_id": "6a00b951e2019c8480631c0c",
+        "student_id": "6a00b951e2019c8480631c06",
+        "course_id": "6a00b951e2019c8480631c08",
+        "grade": 4.5,
+        "date": "2025-12-15T00:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "_id": "6a00b951e2019c8480631c08",
+    "name": "Discrete Mathematics",
+    "lecturer_id": "6a00b951e2019c8480631c05",
+    "semester": 1,
+    "credits": 5,
+    "lecturer": {
+      "_id": "6a00b951e2019c8480631c05",
+      "first_name": "John",
+      "last_name": "Smith",
+      "email": "john.smith@university.edu",
+      "department": "Mathematics"
+    },
+    "enrollments": {
+      "_id": "6a00b951e2019c8480631c0b",
+      "student_id": "6a00b951e2019c8480631c07",
+      "course_id": "6a00b951e2019c8480631c08",
+      "enrollment_date": "2025-09-01T00:00:00.000Z"
+    },
+    "student_info": {
+      "_id": "6a00b951e2019c8480631c07",
+      "first_name": "Bob",
+      "last_name": "Williams",
+      "student_id": "S12346",
+      "email": "bob.williams@student.edu"
+    },
+    "student_grades": [
+      {
+        "_id": "6a00b951e2019c8480631c0d",
+        "student_id": "6a00b951e2019c8480631c07",
+        "course_id": "6a00b951e2019c8480631c08",
+        "grade": 3.8,
+        "date": "2025-12-15T00:00:00.000Z"
+      }
+    ]
+  }
+]
+
+========== DISADVANTAGE 4: Course Ratings (Multiple Lookups) ==========
+[
+  {
+    "_id": "6a00b951e2019c8480631c0e",
+    "student_id": "6a00b951e2019c8480631c06",
+    "course_id": "6a00b951e2019c8480631c08",
+    "rating": 5,
+    "comment": "Excellent course!",
+    "date": "2025-12-20T00:00:00.000Z",
+    "student_info": {
+      "_id": "6a00b951e2019c8480631c06",
+      "first_name": "Alice",
+      "last_name": "Johnson",
+      "student_id": "S12345",
+      "email": "alice.johnson@student.edu"
+    },
+    "course_info": {
+      "_id": "6a00b951e2019c8480631c08",
+      "name": "Discrete Mathematics",
+      "lecturer_id": "6a00b951e2019c8480631c05",
+      "semester": 1,
+      "credits": 5
+    }
+  },
+  {
+    "_id": "6a00b951e2019c8480631c0f",
+    "student_id": "6a00b951e2019c8480631c07",
+    "course_id": "6a00b951e2019c8480631c08",
+    "rating": 4,
+    "comment": "Good content",
+    "date": "2025-12-20T00:00:00.000Z",
+    "student_info": {
+      "_id": "6a00b951e2019c8480631c07",
+      "first_name": "Bob",
+      "last_name": "Williams",
+      "student_id": "S12346",
+      "email": "bob.williams@student.edu"
+    },
+    "course_info": {
+      "_id": "6a00b951e2019c8480631c08",
+      "name": "Discrete Mathematics",
+      "lecturer_id": "6a00b951e2019c8480631c05",
+      "semester": 1,
+      "credits": 5
+    }
+  }
+]
+
+========== DISADVANTAGE 5: Course Attendance List (Multiple Lookups) ==========
+[
+  {
+    "_id": "6a00b951e2019c8480631c08",
+    "name": "Discrete Mathematics",
+    "lecturer_id": "6a00b951e2019c8480631c05",
+    "semester": 1,
+    "credits": 5,
+    "lecturer_info": {
+      "_id": "6a00b951e2019c8480631c05",
+      "first_name": "John",
+      "last_name": "Smith",
+      "email": "john.smith@university.edu",
+      "department": "Mathematics"
+    },
+    "enrollments_data": [
+      {
+        "_id": "6a00b951e2019c8480631c0a",
+        "student_id": "6a00b951e2019c8480631c06",
+        "course_id": "6a00b951e2019c8480631c08",
+        "enrollment_date": "2025-09-01T00:00:00.000Z"
+      },
+      {
+        "_id": "6a00b951e2019c8480631c0b",
+        "student_id": "6a00b951e2019c8480631c07",
+        "course_id": "6a00b951e2019c8480631c08",
+        "enrollment_date": "2025-09-01T00:00:00.000Z"
+      }
+    ],
+    "student_list": [
+      {
+        "_id": "6a00b951e2019c8480631c06",
+        "first_name": "Alice",
+        "last_name": "Johnson",
+        "student_id": "S12345",
+        "email": "alice.johnson@student.edu"
+      },
+      {
+        "_id": "6a00b951e2019c8480631c07",
+        "first_name": "Bob",
+        "last_name": "Williams",
+        "student_id": "S12346",
+        "email": "bob.williams@student.edu"
+      }
+    ]
+  }
+]
+
+========== DISADVANTAGE 6: Course Average Grade (Aggregation with Lookups) ==========
+[
+  {
+    "average_grade": 4.15,
+    "total_grades": 2,
+    "course_name": "Discrete Mathematics"
+  }
+]
+```
+
+### Wariant C
+```js
+
+// Query 1: Get course with all grades in one document (advantage)
+console.log("\n========== ADVANTAGE 1: Course Card with All Grades (Single Document) ==========");
+const query1Result = db.courses.findOne({ _id: courseId1 });
+console.log(JSON.stringify(query1Result, null, 2));
+
+// Query 2: Get student ratings (nested in student - easy access)
+console.log("\n========== ADVANTAGE 2: Student Course Ratings (Nested in Student) ==========");
+const query2Result = db.students.aggregate([
+    { $match: { _id: studentId1 } },
+    { $unwind: "$course_ratings" },
+    {
+        $lookup: {
+            from: "courses",
+            localField: "course_ratings.course_id",
+            foreignField: "_id",
+            as: "course_info"
+        }
+    },
+    { $unwind: "$course_info" },
+    {
+        $project: {
+            _id: 0,
+            student_name: { $concat: ["$first_name", " ", "$last_name"] },
+            course_name: "$course_info.name",
+            rating: "$course_ratings.rating",
+            comment: "$course_ratings.comment",
+            date: "$course_ratings.date"
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query2Result, null, 2));
+
+// Query 3: Add a new grade to course (easy - just push)
+console.log("\n========== ADVANTAGE 3: Adding a New Grade to Course (Simple Push) ==========");
+const addGradeResult = db.courses.updateOne(
+    { _id: courseId2 },
+    {
+        $push: {
+            grades: {
+                student_id: studentId2,
+                grade: 3.9,
+                date: new Date("2025-12-16")
+            }
+        }
+    }
+);
+console.log("Add Grade Result (single operation):");
+console.log(JSON.stringify(addGradeResult, null, 2));
+
+// Verify grades were added
+console.log("\nVerification - Updated Grades in Course:");
+const courseWithNewGrade = db.courses.findOne(
+    { _id: courseId2 },
+    { name: 1, grades: 1 }
+);
+console.log(JSON.stringify(courseWithNewGrade, null, 2));
+
+// Query 4: Add a new course rating to student (simple push)
+console.log("\n========== ADVANTAGE 4: Adding a New Course Rating to Student (Simple Push) ==========");
+const addRatingResult = db.students.updateOne(
+    { _id: studentId2 },
+    {
+        $push: {
+            course_ratings: {
+                course_id: courseId2,
+                rating: 3,
+                comment: "Interesting but difficult",
+                date: new Date("2025-12-22")
+            }
+        }
+    }
+);
+console.log("Add Rating Result (single operation):");
+console.log(JSON.stringify(addRatingResult, null, 2));
+
+// Verify ratings were added
+console.log("\nVerification - Updated Student with New Rating:");
+const studentWithNewRating = db.students.findOne(
+    { _id: studentId2 },
+    { first_name: 1, last_name: 1, course_ratings: 1 }
+);
+console.log(JSON.stringify(studentWithNewRating, null, 2));
+
+// ========== DISADVANTAGES OF VARIANT C ==========
+
+// Query 5: Get all grades for a specific student (disadvantage: requires unwinding)
+console.log("\n========== DISADVANTAGE 1: All Grades for a Student (Requires $unwind All Courses) ==========");
+const query5Result = db.courses.aggregate([
+    { $unwind: "$grades" },
+    { $match: { "grades.student_id": studentId1 } },
+    {
+        $project: {
+            _id: 0,
+            course_name: "$name",
+            student_grade: "$grades.grade",
+            grade_date: "$grades.date"
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query5Result, null, 2));
+
+// Query 6: Update a single grade using array filters (disadvantage: complex)
+console.log("\n========== DISADVANTAGE 2: Updating a Grade (Array Filters Required) ==========");
+const updateResult = db.courses.updateOne(
+    { _id: courseId1, "grades.student_id": studentId1 },
+    { $set: { "grades.$[elem].grade": 4.7 } },
+    { arrayFilters: [{ "elem.student_id": studentId1 }] }
+);
+console.log("Update Result (requires arrayFilters):");
+console.log(JSON.stringify(updateResult, null, 2));
+
+// Verify the update
+console.log("\nVerification - Updated Course:");
+const updatedCourse = db.courses.findOne({ _id: courseId1 });
+console.log(JSON.stringify(updatedCourse, null, 2));
+
+// Query 7: Course average grade (disadvantage: requires $unwind)
+console.log("\n========== DISADVANTAGE 3: Course Average Grade (Requires $unwind) ==========");
+const query7Result = db.courses.aggregate([
+    { $match: { _id: courseId1 } },
+    { $unwind: "$grades" },
+    {
+        $group: {
+            _id: "$_id",
+            course_name: { $first: "$name" },
+            average_grade: { $avg: "$grades.grade" },
+            total_students: { $sum: 1 }
+        }
+    }
+]).toArray();
+console.log(JSON.stringify(query7Result, null, 2));
+
+// Query 8: Enroll student to course (disadvantage: requires 2 updates + document grows)
+console.log("\n========== DISADVANTAGE 4: Enroll Student to Course (2 Updates + Document Grows) ==========");
+const enrollResult1 = db.students.updateOne(
+    { _id: studentId2 },
+    { $push: { course_ids: courseId2 } }
+);
+console.log("Update 1 - Add course to student:");
+console.log(JSON.stringify(enrollResult1, null, 2));
+
+const enrollResult2 = db.courses.updateOne(
+    { _id: courseId2 },
+    { $push: { enrolled_students: { student_id: studentId2, student_number: "S12346" } } }
+);
+console.log("Update 2 - Add student to course (document size grows):");
+console.log(JSON.stringify(enrollResult2, null, 2));
+
+// Query 9: Unenroll student from course (disadvantage: requires 2 updates)
+console.log("\n========== DISADVANTAGE 5: Unenroll Student from Course (2 Updates) ==========");
+const unenrollResult1 = db.students.updateOne(
+    { _id: studentId2 },
+    { $pull: { course_ids: courseId1 } }
+);
+console.log("Update 1 - Remove course from student:");
+console.log(JSON.stringify(unenrollResult1, null, 2));
+
+const unenrollResult2 = db.courses.updateOne(
+    { _id: courseId1 },
+    { $pull: { enrolled_students: { student_id: studentId2 } } }
+);
+console.log("Update 2 - Remove student from course:");
+console.log(JSON.stringify(unenrollResult2, null, 2));
+```
+
+Rezultat:
+```json
+========== ADVANTAGE 1: Course Card with All Grades (Single Document) ==========
+{
+  "_id": "6a00b9715908c65544519bac",
+  "name": "Discrete Mathematics",
+  "lecturer_id": "6a00b9715908c65544519ba9",
+  "semester": 1,
+  "credits": 5,
+  "enrolled_students": [
+    {
+      "student_id": "6a00b9715908c65544519baa",
+      "student_number": "S12345"
+    },
+    {
+      "student_id": "6a00b9715908c65544519bab",
+      "student_number": "S12346"
+    }
+  ],
+  "grades": [
+    {
+      "student_id": "6a00b9715908c65544519baa",
+      "grade": 4.5,
+      "date": "2025-12-15T00:00:00.000Z"
+    },
+    {
+      "student_id": "6a00b9715908c65544519bab",
+      "grade": 3.8,
+      "date": "2025-12-15T00:00:00.000Z"
+    }
+  ]
+}
+
+========== ADVANTAGE 2: Student Course Ratings (Nested in Student) ==========
+[
+  {
+    "student_name": "Alice Johnson",
+    "course_name": "Discrete Mathematics",
+    "rating": 5,
+    "comment": "Excellent course!",
+    "date": "2025-12-20T00:00:00.000Z"
+  },
+  {
+    "student_name": "Alice Johnson",
+    "course_name": "Data Structures",
+    "rating": 4,
+    "comment": "Good, but challenging",
+    "date": "2025-12-21T00:00:00.000Z"
+  }
+]
+
+========== ADVANTAGE 3: Adding a New Grade to Course (Simple Push) ==========
+Add Grade Result (single operation):
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+
+Verification - Updated Grades in Course:
+{
+  "_id": "6a00b9715908c65544519bad",
+  "name": "Data Structures",
+  "grades": [
+    {
+      "student_id": "6a00b9715908c65544519baa",
+      "grade": 4.2,
+      "date": "2025-12-16T00:00:00.000Z"
+    },
+    {
+      "student_id": "6a00b9715908c65544519bab",
+      "grade": 3.9,
+      "date": "2025-12-16T00:00:00.000Z"
+    }
+  ]
+}
+
+========== ADVANTAGE 4: Adding a New Course Rating to Student (Simple Push) ==========
+Add Rating Result (single operation):
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+
+Verification - Updated Student with New Rating:
+{
+  "_id": "6a00b9715908c65544519bab",
+  "first_name": "Bob",
+  "last_name": "Williams",
+  "course_ratings": [
+    {
+      "course_id": "6a00b9715908c65544519bac",
+      "rating": 4,
+      "comment": "Good content",
+      "date": "2025-12-20T00:00:00.000Z"
+    },
+    {
+      "course_id": "6a00b9715908c65544519bad",
+      "rating": 3,
+      "comment": "Interesting but difficult",
+      "date": "2025-12-22T00:00:00.000Z"
+    }
+  ]
+}
+
+========== DISADVANTAGE 1: All Grades for a Student (Requires $unwind All Courses) ==========
+[
+  {
+    "course_name": "Discrete Mathematics",
+    "student_grade": 4.5,
+    "grade_date": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "course_name": "Data Structures",
+    "student_grade": 4.2,
+    "grade_date": "2025-12-16T00:00:00.000Z"
+  }
+]
+
+========== DISADVANTAGE 2: Updating a Grade (Array Filters Required) ==========
+Update Result (requires arrayFilters):
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+
+Verification - Updated Course:
+{
+  "_id": "6a00b9715908c65544519bac",
+  "name": "Discrete Mathematics",
+  "lecturer_id": "6a00b9715908c65544519ba9",
+  "semester": 1,
+  "credits": 5,
+  "enrolled_students": [
+    {
+      "student_id": "6a00b9715908c65544519baa",
+      "student_number": "S12345"
+    },
+    {
+      "student_id": "6a00b9715908c65544519bab",
+      "student_number": "S12346"
+    }
+  ],
+  "grades": [
+    {
+      "student_id": "6a00b9715908c65544519baa",
+      "grade": 4.7,
+      "date": "2025-12-15T00:00:00.000Z"
+    },
+    {
+      "student_id": "6a00b9715908c65544519bab",
+      "grade": 3.8,
+      "date": "2025-12-15T00:00:00.000Z"
+    }
+  ]
+}
+
+========== DISADVANTAGE 3: Course Average Grade (Requires $unwind) ==========
+[
+  {
+    "_id": "6a00b9715908c65544519bac",
+    "course_name": "Discrete Mathematics",
+    "average_grade": 4.25,
+    "total_students": 2
+  }
+]
+
+========== DISADVANTAGE 4: Enroll Student to Course (2 Updates + Document Grows) ==========
+Update 1 - Add course to student:
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+Update 2 - Add student to course (document size grows):
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+
+========== DISADVANTAGE 5: Unenroll Student from Course (2 Updates) ==========
+Update 1 - Remove course from student:
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+Update 2 - Remove student from course:
+{
+  "acknowledged": true,
+  "insertedId": null,
+  "matchedCount": 1,
+  "modifiedCount": 1,
+  "upsertedCount": 0
+}
+
 ```
