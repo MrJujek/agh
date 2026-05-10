@@ -801,7 +801,7 @@ Napisz polecenie które dodaje takie zamówienie do bazy
 - aktualizując kolekcję `CustomerInfo`
 
 Napisz polecenie 
-- aktualizując oryginalną kolekcję orderdetails`
+- aktualizując oryginalną kolekcję `orderdetails`
 - aktualizując kolekcję `OrderInfo`
 - aktualizując kolekcję `CustomerInfo`
 
@@ -1019,17 +1019,17 @@ verification: {
 # Zadanie 2 - modelowanie danych
 
 Wybraliśmy przykład A:
-- Lecturers, courses, students, grades
-  - Lecturers run courses
-  - Students attend courses
-  - Lecturers assign grades to students
-  - Students rate courses
+- Wykładowcy, przedmioty, studenci, oceny
+  - Wykładowcy prowadzą zajęcia z poszczególnych przedmiotów
+  - Studenci uczęszczają na zajęcia
+  - Wykładowcy wystawiają oceny studentom
+  - Studenci oceniają zajęcia
 
 ## a) Trzy warianty, które rozważaliśmy:
 
 ### Wariant A — Hybrydowy zrównoważony
 
-Separate collections for: lecturers (`lecturers`), students (`students`), courses (`courses`), grades (`grades`) and course_ratings (`course_ratings`). Both student and course may keep arrays `course_ids` / `students_ids` on their side.
+Osobne kolekcje dla: wykładowców (`lecturers`), studentów (`students`), przedmiotów (`courses`), ocen (`grades`) i ocen zajęć (`course_ratings`).  Zarówno studenci jak i przedmioty mogą trzymać tablice `course_ids` / `students_ids` u siebie.
 
 #### Zalety i wady tego rozwiązania
 - *Zalety*: jeden `$lookup` zamiast trzech dla typowych zapytań; dane statyczne (lista zapisanych) blisko przedmiotu; dane dynamiczne (oceny) osobno; skalowalne; naturalnie odzwierciedla sposób użycia systemu (profil studenta, karta przedmiotu, dziennik ocen to trzy różne widoki).
@@ -1137,7 +1137,7 @@ db.createCollection("course_ratings", {
 
 ### Wariant B — Czyste referencje (podejście relacyjne)
 
-Five collections without nesting: lecturers (`lecturers`), students (`students`), courses (`courses`), grades (`grades`) and course_ratings (`course_ratings`). The student–course relation can be implemented via an enrollments collection. Documents are linked by `_id`.
+Pięć kolekcji bez zagnieżdżania: wykładowcy (`lecturers`), studenci (`students`), przedmioty (`courses`), oceny (`grades`) i oceny zajęć (`course_ratings`). Relacja student - przedmiot jest zaimplementowana przez kolekcję zapisów `enrollments`. Dokumenty są połączone poprzez pole `_id`.
 #### Zalety i wady tego rozwiązania
 
 - *Zalety*: brak redundancji; zmiana danych w jednym miejscu; prosta walidacja każdej kolekcji z osobna.
@@ -1242,7 +1242,7 @@ db.createCollection("course_ratings", {
 });
 ```
 
-### Wariant C — Hybrydowy skrzywiony ku zagnieżdżeniu
+### Wariant C — Hybrydowy ukierunkowany na zagnieżdżanie
 
 Podobnie do wariantu A, ale zamiast osobnej kolekcji `grades` — oceny są zagnieżdżone bezpośrednio w dokumencie przedmiotu jako tablica { `student_id`, `grade`, `date` }. Oceny zajęć zagnieżdżone w dokumencie studenta.
 
@@ -1656,7 +1656,7 @@ db.courses.insertMany([
 ]);
 ```
 
-## c) Zapytania ukazujące wady i zalety danego wariantu
+## c) Zapytania ukazujące zalety i wady danego wariantu
 
 ### Wariant A
 ```js
