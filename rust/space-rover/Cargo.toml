@@ -1,0 +1,10 @@
+[package]
+name = "space-rover"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.14"
+bevy_panorbit_camera = "0.19"
+cspice-sys = { version = "1.0.4", features = ["downloadcspice"] }
+rust-spice = { version = "0.7.8", features = ["download"] }
