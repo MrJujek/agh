@@ -44,14 +44,10 @@ defmodule Pollutiondb.Station do
     |> Pollutiondb.Repo.all
   end
 
-  def update_station(station, newName) do
+  def update_name(station, newname) do
     station
-    |> changeset(%{name: newName})
+    |> changeset(%{name: newname})
     |> Pollutiondb.Repo.update
-
-#    Ecto.Changeset.cast(station, %{name: newName}, [:name])
-#    |> Ecto.Changeset.validate_required([:name])
-#    |> Pollutiondb.Repo.update
   end
 
   def add(name, lon, lat) do
@@ -60,8 +56,8 @@ defmodule Pollutiondb.Station do
     |> Pollutiondb.Repo.insert
   end
 
-  defp changeset(station, changesMap) do
-    Ecto.Changeset.cast(changesMap, [:name, :lon, :lat])
+  defp changeset(station, changes_map) do
+    Ecto.Changeset.cast(station, changes_map, [:name, :lon, :lat])
     |> Ecto.Changeset.validate_required([:name, :lon, :lat])
     |> Ecto.Changeset.validate_number(:lon, greater_than: -180, less_than: 180)
     |> Ecto.Changeset.validate_number(:lat, greater_than: -90, less_than: 90)
