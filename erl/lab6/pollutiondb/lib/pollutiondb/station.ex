@@ -6,6 +6,8 @@ defmodule Pollutiondb.Station do
     field :name, :string
     field :lon, :float
     field :lat, :float
+
+    has_many :readings, Pollutiondb.Reading
   end
 
   def add(station) do
