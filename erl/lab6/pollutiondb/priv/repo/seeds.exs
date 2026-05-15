@@ -18,13 +18,8 @@ PollutionDataLoader.parse_lines(lines)
 |> Enum.each(fn reading_row ->
   station = Map.fetch!(stations_by_key, reading_row.station_id)
 
-  Repo.insert(%Reading{
-    date: reading_row.date,
-    time: reading_row.time,
-    type: reading_row.type,
-    value: reading_row.value,
-    station_id: station.id
-  })
+  {:ok, _reading} =
+    Reading.add(station, reading_row.date, reading_row.time, reading_row.type, reading_row.value)
 end)
 
 Enum.zip(

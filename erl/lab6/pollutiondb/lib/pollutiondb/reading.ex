@@ -11,15 +11,19 @@ defmodule Pollutiondb.Reading do
     belongs_to :station, Pollutiondb.Station
   end
 
-  def add_now(station, type, value) do
+  def add(station, date, time, type, value) do
     Ecto.build_assoc(station, :readings)
     |> changeset(%{
-      date: Date.utc_today(),
-      time: Time.utc_now() |> Time.truncate(:second),
+      date: date,
+      time: time,
       type: type,
       value: value
     })
     |> Pollutiondb.Repo.insert()
+  end
+
+  def add_now(station, type, value) do
+    add(station, Date.utc_today(), Time.utc_now() |> Time.truncate(:second), type, value)
   end
 
   def find_by_date(date) do
