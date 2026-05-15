@@ -27,4 +27,16 @@ PollutionDataLoader.parse_lines(lines)
   })
 end)
 
+Enum.zip(
+  Enum.take(station_rows, 3),
+  [{"PM10", 42.0}, {"PM25", 27.5}, {"TEMPERATURE", 8.1}]
+)
+|> Enum.each(fn {station_row, {type, value}} ->
+  station = Map.fetch!(stations_by_key, station_row.station_id)
+  {:ok, _reading} = Reading.add_now(station, type, value)
+end)
+
+today_count = Reading.find_by_date(Date.utc_today()) |> length()
+
 IO.puts("Imported #{map_size(stations_by_key)} stations and #{length(lines)} readings")
+IO.puts("Added #{today_count} readings for today")
