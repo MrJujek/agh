@@ -34,5 +34,6 @@ defmodule Pollutiondb.Reading do
   defp changeset(reading, changes_map) do
     Ecto.Changeset.cast(reading, changes_map, [:date, :time, :type, :value])
     |> Ecto.Changeset.validate_required([:date, :time, :type, :value])
+    |> Ecto.Changeset.unique_constraint(:station_id, name: :readings_station_date_time_type_index)
   end
 end

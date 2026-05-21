@@ -63,5 +63,6 @@ defmodule Pollutiondb.Station do
     |> Ecto.Changeset.validate_required([:name, :lon, :lat])
     |> Ecto.Changeset.validate_number(:lon, greater_than: -180, less_than: 180)
     |> Ecto.Changeset.validate_number(:lat, greater_than: -90, less_than: 90)
+    |> Ecto.Changeset.unique_constraint(:name, name: :stations_name_index)
   end
 end
