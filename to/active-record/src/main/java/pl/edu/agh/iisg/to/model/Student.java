@@ -1,12 +1,12 @@
 package pl.edu.agh.iisg.to.model;
 
+import pl.edu.agh.iisg.to.executor.QueryExecutor;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-
-import pl.edu.agh.iisg.to.executor.QueryExecutor;
 
 public class Student {
     private final int id;
@@ -25,20 +25,36 @@ public class Student {
     }
 
     public static Optional<Student> create(final String firstName, final String lastName, final int indexNumber) {
-        // TODO
-        String sql = "";
+        String sql = "insert into student (first_name, last_name, index_number) values(?, ?, ?)";
+        Object[] args = {firstName, lastName, String.valueOf(indexNumber)};
 
-        // TODO
-        // it is important to maintain the correct order of the variables
-        Object[] args = { };
-
-
-        return Optional.empty();
+        try {
+            int id = QueryExecutor.createAndObtainId(sql, args);
+            return Student.findById(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
     }
 
     public static Optional<Student> findByIndexNumber(final int indexNumber) {
-        // TODO
-        return Optional.empty();
+        String sql = "select * from student where index_number = ?";
+        Object[] args = {indexNumber};
+
+        try (ResultSet res = QueryExecutor.read(sql, args)) {
+            if (res.next()) {
+                return Optional.of(new Student(
+                        res.getInt("id"),
+                        res.getString("first_name"),
+                        res.getString("last_name"),
+                        res.getInt("index_number")
+                ));
+            } else {
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Optional<Student> findById(final int id) {
@@ -66,6 +82,8 @@ public class Student {
     }
 
     public Map<Course, Float> createReport() {
+        String sql = "";
+        Object[] args = {};
         // TODO additional task
         return Collections.emptyMap();
     }
@@ -84,17 +102,6 @@ public class Student {
 
     public int indexNumber() {
         return indexNumber;
-    }
-
-    public static class Columns {
-
-        public static final String ID = "id";
-
-        public static final String FIRST_NAME = "first_name";
-
-        public static final String LAST_NAME = "last_name";
-
-        public static final String INDEX_NUMBER = "index_number";
     }
 
     @Override
@@ -122,5 +129,16 @@ public class Student {
         result = 31 * result + lastName.hashCode();
         result = 31 * result + indexNumber;
         return result;
+    }
+
+    public static class Columns {
+
+        public static final String ID = "id";
+
+        public static final String FIRST_NAME = "first_name";
+
+        public static final String LAST_NAME = "last_name";
+
+        public static final String INDEX_NUMBER = "index_number";
     }
 }

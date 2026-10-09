@@ -1,13 +1,13 @@
 package pl.edu.agh.iisg.to.model;
 
+import pl.edu.agh.iisg.to.executor.QueryExecutor;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-
-import pl.edu.agh.iisg.to.executor.QueryExecutor;
 
 public class Course {
 
@@ -18,10 +18,8 @@ public class Course {
     private final int id;
 
     private final String name;
-
+    private final boolean isStudentsListDownloaded = false;
     private List<Student> enrolledStudents;
-
-    private boolean isStudentsListDownloaded = false;
 
     Course(final int id, final String name) {
         this.id = id;
@@ -65,30 +63,47 @@ public class Course {
     }
 
     public boolean enrollStudent(final Student student) {
-        String enrollStudentSql = "";
-        Object[] args = {
+        String checkIfUserIsEnrolledSql = "select student_id from student_course where stude";
 
+        String enrollStudentSql = "insert into student_course (student_id, course_id) values (?, ?)";
+        Object[] args = {
+                student.id(),
+                id()
         };
 
-        //TODO
-
-        return false;
+        try {
+            QueryExecutor.create(enrollStudentSql, args);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public List<Student> studentList() {
-        String findStudentListSql = "";
+        String findStudentListSql = "select student_id from student_course where course_id = ?";
         Object[] args = {
-
+                this.id
         };
 
         List<Student> resultList = new LinkedList<>();
-        // TODO
+
+        try (ResultSet res = QueryExecutor.read(findStudentListSql, args)) {
+            while (res.next()) {
+                Optional<Student> optS = Student.findById(res.getInt("student_id"));
+                optS.ifPresent(resultList::add);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         return resultList;
     }
 
     public List<Student> cachedStudentsList() {
-        //TOTO implement
+        if (!isStudentsListDownloaded) {
+            this.enrolledStudents = this.studentList();
+        }
         return enrolledStudents;
     }
 
@@ -98,14 +113,6 @@ public class Course {
 
     public String name() {
         return name;
-    }
-
-    public static class Columns {
-
-        public static final String ID = "id";
-
-        public static final String NAME = "name";
-
     }
 
     @Override
@@ -124,5 +131,13 @@ public class Course {
         int result = id;
         result = 31 * result + name.hashCode();
         return result;
+    }
+
+    public static class Columns {
+
+        public static final String ID = "id";
+
+        public static final String NAME = "name";
+
     }
 }
