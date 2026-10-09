@@ -27,3 +27,8 @@ deps
 .rebar3
 _build/
 _checkouts/
+
+# java
+.gradle/
+.idea/
+build/
