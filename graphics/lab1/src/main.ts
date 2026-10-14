@@ -1,0 +1,154 @@
+import "./style.css";
+
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+window.addEventListener("load", function () {
+  const app = document.getElementById("app") as HTMLDivElement;
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    10000,
+  );
+  camera.position.set(100, 100, 100);
+
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setClearColor(0x444);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  app.appendChild(renderer.domElement);
+
+  const axes = new THREE.AxesHelper(1000);
+  scene.add(axes);
+  camera.lookAt(scene.position);
+
+  // const geometry = new THREE.BoxGeometry(20, 20, 20, 3, 3, 3);
+  // const material = new THREE.MeshBasicMaterial({
+  //   color: 0x8888ff,
+  //   side: THREE.DoubleSide,
+  //   wireframe: true,
+  //   transparent: true,
+  //   opacity: 0.8,
+  // });
+  // const cube = new THREE.Mesh(geometry, material);
+  // scene.add(cube);
+
+  const house = makeHouse();
+  house.position.set(30, 0, 0);
+  scene.add(house);
+
+  const tree = makeTree();
+  tree.position.set(0, 0, 0);
+  tree.scale.set(3, 3, 3);
+  scene.add(tree);
+
+  const car = makeCar();
+  car.position.set(70, 0, 0);
+  car.scale.set(5, 5, 5);
+  scene.add(car);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  function render() {
+    requestAnimationFrame(render);
+    console.log("render leci");
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  render();
+
+  window.addEventListener("resize", onWindowResize, false);
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+});
+
+const makeHouse = (): THREE.Group => {
+  const house = new THREE.Group();
+
+  const wallsGeometry = new THREE.BoxGeometry(20, 20, 20);
+
+  const wallsMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const walls = new THREE.Mesh(wallsGeometry, wallsMaterial);
+  walls.position.set(0, 10, 0);
+  house.add(walls);
+
+  const doorGeometry = new THREE.BoxGeometry(5, 10, 1.01);
+  const doorMaterial = new THREE.MeshBasicMaterial({ color: 0x654321 });
+  const door = new THREE.Mesh(doorGeometry, doorMaterial);
+  door.position.set(0, 5, 10);
+  house.add(door);
+
+  const windowGeometry = new THREE.BoxGeometry(5, 5, 1);
+  const windowMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+  const window1 = new THREE.Mesh(windowGeometry, windowMaterial);
+  window1.position.set(-7, 12.5, 10);
+  house.add(window1);
+
+  const roofGeometry = new THREE.ConeGeometry(15, 10, 4);
+  const roofMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+  roof.position.y = 25;
+  roof.rotation.y = Math.PI / 4;
+  house.add(roof);
+
+  return house;
+};
+
+const makeTree = (): THREE.Group => {
+  const tree = new THREE.Group();
+
+  const trunkGeometry = new THREE.CylinderGeometry(1, 1, 5);
+  const trunkMaterial = new THREE.MeshBasicMaterial({ color: 0x8b4513 });
+  const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+  trunk.position.y = 2.5;
+  tree.add(trunk);
+
+  const foliageGeometry = new THREE.ConeGeometry(3, 6, 8);
+  const foliageMaterial = new THREE.MeshBasicMaterial({ color: 0x228b22 });
+  const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+  foliage.position.y = 7;
+  tree.add(foliage);
+
+  return tree;
+};
+
+const makeCar = (): THREE.Group => {
+  const car = new THREE.Group();
+
+  const bodyGeometry = new THREE.BoxGeometry(4, 1.5, 2);
+  const bodyMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  body.position.y = 1;
+  car.add(body);
+
+  const wheelGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.5, 32);
+  const wheelMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+  const wheelPositions = [
+    [-1.5, 0.5, -1], // front left
+    [1.5, 0.5, -1], // front right
+    [-1.5, 0.5, 1], // back left
+    [1.5, 0.5, 1], // back right
+  ];
+
+  wheelPositions.forEach((pos) => {
+    const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    wheel.rotation.z = Math.PI / 2;
+    wheel.rotation.y = Math.PI / 4;
+    wheel.position.set(pos[0], pos[1], pos[2]);
+    car.add(wheel);
+  });
+
+  return car;
+};
