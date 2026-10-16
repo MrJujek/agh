@@ -14,17 +14,23 @@ public class StudentDao extends GenericDao<Student> {
     }
 
     public Optional<Student> create(final String firstName, final String lastName, final int indexNumber) {
-        // TODO - implement
-        return Optional.empty();
+        Student student = new Student(firstName, lastName, indexNumber);
+        return save(student);
     }
 
     public List<Student> findAll() {
-        // TODO - implement
-        return Collections.emptyList();
+        List<Student> students = currentSession()
+                .createQuery("SELECT s from Student s order by s.lastName asc", Student.class)
+                .getResultList();
+
+        return students;
     }
 
     public Optional<Student> findByIndexNumber(final int indexNumber) {
-        // TODO - implement
-        return Optional.empty();
+        Student student = currentSession()
+                .createQuery("SELECT s from Student s where s.indexNumber = :indexNumber", Student.class)
+                .setParameter("indexNumber", indexNumber)
+                .getSingleResult();
+        return findById(student.id());
     }
 }

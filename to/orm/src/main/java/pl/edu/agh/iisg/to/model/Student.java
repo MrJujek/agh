@@ -13,21 +13,32 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
+@Table(name = Student.TABLE_NAME)
 public class Student {
 
     public static final String TABLE_NAME = "student";
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    @Column(name = Student.Columns.ID)
     private int id;
 
+    @Column(name = Columns.FIRST_NAME, length = 50, nullable = false)
     private String firstName;
 
+    @Column(name = Columns.LAST_NAME, length = 50, nullable = false)
     private String lastName;
 
+    @Column(name = Columns.INDEX_NUMBER, unique = true, nullable = false)
     private int indexNumber;
 
+    @OneToMany(mappedBy = "student")
     private Set<Grade> gradeSet = new HashSet<>();
 
+    @ManyToMany(mappedBy = "studentSet")
     private Set<Course> courseSet = new HashSet<>();
+
 
     Student() {
     }

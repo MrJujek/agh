@@ -1,10 +1,12 @@
 package pl.edu.agh.iisg.to.service;
 
+import org.hibernate.Session;
 import pl.edu.agh.iisg.to.dao.CourseDao;
 import pl.edu.agh.iisg.to.dao.GradeDao;
 import pl.edu.agh.iisg.to.dao.StudentDao;
 import pl.edu.agh.iisg.to.model.Course;
 import pl.edu.agh.iisg.to.model.Student;
+import pl.edu.agh.iisg.to.session.SessionService;
 import pl.edu.agh.iisg.to.session.TransactionService;
 
 import java.util.Collections;
@@ -30,6 +32,7 @@ public class SchoolService {
 
     public boolean enrollStudent(final Course course, final Student student) {
         // TODO - implement
+        Session session = new SessionService().getSession();
         return false;
     }
 
