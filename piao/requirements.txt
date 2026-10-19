@@ -1,0 +1,5 @@
+ipykernel
+pooch
+numpy
+matplotlib
+scikit-image
