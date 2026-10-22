@@ -1,5 +1,6 @@
 package pl.edu.agh.iisg.to.dao;
 
+import jakarta.persistence.PersistenceException;
 import pl.edu.agh.iisg.to.model.Student;
 import pl.edu.agh.iisg.to.session.SessionService;
 
@@ -27,10 +28,14 @@ public class StudentDao extends GenericDao<Student> {
     }
 
     public Optional<Student> findByIndexNumber(final int indexNumber) {
-        Student student = currentSession()
-                .createQuery("SELECT s from Student s where s.indexNumber = :indexNumber", Student.class)
-                .setParameter("indexNumber", indexNumber)
-                .getSingleResult();
-        return findById(student.id());
+        try {
+            return currentSession()
+                    .createQuery("SELECT s from Student s where s.indexNumber = :indexNumber", Student.class)
+                    .setParameter("indexNumber", indexNumber)
+                    .uniqueResultOptional();
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 }
